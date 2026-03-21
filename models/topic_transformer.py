@@ -28,7 +28,7 @@ try:
         weight_init, InformationBottleneck, TopicDecoder,
         reparameterize, log_to_simplex)
     from .encoders import (
-        CellAsTokenLogisticNormalEncoder, GeneAsTokenLogisticNormalEncoder,
+        MultiHeadProjectionLogisticNormalEncoder, HybridMLPAttentionLogisticNormalEncoder,
         MLPLogisticNormalEncoder, create_topic_encoder)
 except ImportError:
     from utils.base_model import BaseModel
@@ -167,7 +167,6 @@ class TopicODETransformerModel(PriorMixin, ReconstructionLossMixin, BaseModel):
             dropout=dropout,
             use_bottleneck=use_bottleneck,
             bottleneck_dim=bottleneck_dim,
-            ode_hidden=ode_hidden,
             encoder_type=encoder_type)
         
         # Priors

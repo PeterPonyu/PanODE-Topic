@@ -1,148 +1,108 @@
 # PanODE-Topic
 
-Single-cell representation learning with logistic-normal topic models, featuring Transformer / contrastive / standalone ablation variants.
+Flow-matching-refined Dirichlet-prior variational autoencoders for interpretable and structurally balanced single-cell representation learning.
 
 ## Project Structure
 
 ```
-PanODE-LAB/
-├── models/                       # Core model implementations
-│   ├── encoders.py               # Shared encoder architectures
-│   ├── shared_modules.py         # Reusable layers & blocks
-│   ├── dpmm_base.py              # DPMM base model (AE + DPMM clustering)
-│   ├── dpmm_transformer.py       # DPMM + Transformer encoder
-│   ├── dpmm_contrastive.py       # DPMM + MoCo contrastive learning
-│   ├── topic_base.py             # Logistic-normal topic model
-│   ├── topic_transformer.py      # Topic + Transformer encoder
-│   └── topic_contrastive.py      # Topic + MoCo contrastive learning
+PanODE-Topic/
+├── models/                        # Core model implementations
+│   ├── encoders.py                # Encoder architectures (MLP, Transformer, Hybrid, GAT)
+│   ├── shared_modules.py          # Reusable layers, TopicDecoder, kNN graph utils
+│   ├── topic_flow_matching.py     # Flow matching mixin (SinusoidalTimeEmb, LatentFlowField)
+│   ├── topic_base.py              # Topic-Base (logistic-normal topic VAE)
+│   ├── topic_transformer.py       # Topic-Transformer (self-attention encoder)
+│   ├── topic_contrastive.py       # Topic-Contrastive (MoCo contrastive)
+│   ├── topic_fm_base.py           # Topic-FM-Base (+ flow matching)
+│   ├── topic_fm_transformer.py    # Topic-FM-Transformer (+ flow matching)
+│   ├── topic_fm_contrastive.py    # Topic-FM-Contrastive (+ flow matching)
+│   ├── topic_fm_gat.py            # Topic-FM-GAT (GAT encoder + flow matching)
+│   └── pure_vae.py                # Prior-free VAE baselines
 │
-├── metrics/                      # Evaluation metrics
-│   ├── dre.py                    # Dimensionality Reduction Evaluator
-│   ├── lse.py                    # Latent Space Evaluator
-│   └── rhe.py                    # Representation Health Evaluator
+├── eval_lib/                      # Evaluation & experiment library
+│   ├── metrics/                   # DRE, LSE, DREX, LSEX metric batteries
+│   ├── viz/                       # RigorousExperimentalAnalyzer, publication figures
+│   ├── experiment/                # Experiment config, merge, templates
+│   └── baselines/                 # 21+ external baseline model wrappers
 │
-├── utils/                        # Shared utilities
-│   ├── base_model.py             # Unified model interface (fit / extract_latent)
-│   ├── mixins.py                 # Shared model components & mixins
-│   ├── data.py                   # Data loading and preprocessing
-│   └── viz.py                    # Publication-quality visualisation tools
+├── utils/                         # Shared utilities
+│   ├── base_model.py              # Unified model interface (fit / extract_latent)
+│   ├── mixins.py                  # PriorMixin, ReconstructionLossMixin
+│   ├── data.py                    # Data loading and preprocessing
+│   └── viz.py                     # Visualisation helpers
 │
-└── benchmarks/                   # Benchmarking
-    ├── benchmark_base.py         # Consolidated benchmark (12 model variants)
-    └── config.py                 # Centralised benchmark configuration
+├── benchmarks/                    # Benchmarking infrastructure
+│   ├── config.py                  # Centralised benchmark configuration
+│   ├── model_registry.py          # Model factory & registration
+│   ├── dataset_registry.py        # 56-dataset catalogue
+│   ├── figure_generators/         # Subplot generation for composed figures
+│   ├── runners/                   # Benchmark runner modules
+│   └── biological_validation/     # GO enrichment, perturbation analysis
+│
+├── refined_figures/               # Publication figure generators (Fig 1, 3-9)
+│   ├── fig01_architecture.py      # Architecture diagram (4 FM variants)
+│   ├── fig03_sensitivity.py       # Hyperparameter sensitivity
+│   ├── fig04_training_umaps.py    # UMAP sweep evolution
+│   ├── fig05_crossdataset.py      # Cross-dataset scatter plots
+│   ├── fig06_biological.py        # Gene importance & decoder beta
+│   ├── fig07_correlation.py       # Latent-gene correlation
+│   ├── fig08_latent_umap.py       # Component UMAP projections
+│   ├── fig09_enrichment.py        # GO enrichment dot plots
+│   └── generate_all.py            # Dispatcher
+│
+├── scripts/                       # Pipeline scripts
+│   ├── regenerate_figures.py      # Experiment-pipeline figure generation
+│   ├── refresh_figures.sh         # Full 5-step figure refresh pipeline
+│   └── generate_latex_tables.py   # Automated table generation
+│
+├── experiments/                   # Experiment runners & results
+│   ├── run_external_benchmark.py  # External baseline comparison
+│   └── merge_and_visualize.py     # Result merging & visualization
+│
+├── article/topic/                 # LaTeX manuscript (MDPI template)
+│   ├── main_mdpi.tex              # Main article source
+│   ├── tables/                    # Auto-generated table .tex files
+│   └── Definitions/               # MDPI class & style files
+│
+└── src/visualization/             # Layout & style engine
+    ├── direct_layout.py           # LayoutRegion-based figure composition
+    └── style.py                   # Publication styles, VCD integration
 ```
 
-## Quick Start
+## Model Variants
 
-### Installation
+| Model | Encoder | Prior | Flow Matching | Description |
+|-------|---------|-------|---------------|-------------|
+| Topic-FM-Base | MLP | Dirichlet | Yes | Feedforward + FM refinement |
+| Topic-FM-Transformer | Self-attention | Dirichlet | Yes | Cell-as-token + FM |
+| Topic-FM-Contrastive | MLP + MoCo | Dirichlet | Yes | Contrastive + FM |
+| Topic-FM-GAT | GAT (kNN) | Dirichlet | Yes | Graph attention + FM |
+| Pure-VAE | MLP | Gaussian | No | Prior-free baseline |
+| Pure-Transformer-VAE | Self-attention | Gaussian | No | Baseline |
+| Pure-Contrastive-VAE | MLP + MoCo | Gaussian | No | Baseline |
 
-```bash
-pip install torch numpy scipy scikit-learn scanpy torchdiffeq pandas matplotlib seaborn
-```
-
-### Run Benchmarks
-
-```bash
-# Full benchmark — all 12 model variants, 200 epochs, no early stopping
-python benchmarks/benchmark_base.py --epochs 200 --no-early-stopping --series all
-
-# DPMM series only
-python benchmarks/benchmark_base.py --epochs 200 --series dpmm
-
-# Topic series only
-python benchmarks/benchmark_base.py --epochs 200 --series topic
-
-# Quick smoke test (5 epochs)
-python benchmarks/benchmark_base.py --epochs 5 --no-early-stopping --series all
-```
-
-## Model Overview
-
-### 12 Benchmark Variants
-
-| # | Model | Family | Description |
-|---|-------|--------|-------------|
-| 1 | Pure-AE | Baseline | Vanilla autoencoder (reconstruction only) |
-| 2 | DPMM-Base | DPMM | AE + DPMM clustering with two-phase warmup |
-| 3 | DPMM-Transformer | DPMM | DPMM + gene-as-token self-attention |
-| 4 | DPMM-Contrastive | DPMM | DPMM + MoCo-v2 contrastive learning |
-| 5 | Pure-VAE | Baseline | Vanilla VAE (reconstruction + KL) |
-| 6 | Topic-Base | Topic | Logistic-normal topic model |
-| 7 | Topic-Transformer | Topic | Topic + gene-as-token self-attention |
-| 8 | Topic-Contrastive | Topic | Topic + MoCo-v2 contrastive learning |
-| 9 | Pure-Transformer-AE | Ablation | Transformer encoder only (no DPMM/Topic) |
-| 10 | Pure-Contrastive-AE | Ablation | Contrastive encoder only (no DPMM/Topic) |
-| 11 | Pure-Transformer-VAE | Ablation | Transformer + KL (no Topic) |
-| 12 | Pure-Contrastive-VAE | Ablation | Contrastive + KL (no Topic) |
-
-### Unified Hyperparameters
+## Hyperparameters
 
 | Parameter | Value | Notes |
 |-----------|-------|-------|
 | Learning rate | 1e-3 | All models |
-| Latent dim | 10 | All models |
+| KL weight | 0.01 | Topic & VAE series |
+| Latent dim (n_topics) | 10 | All topic models |
 | Batch size | 128 | All models |
+| Epochs | 1000 | Canonical refresh |
+| FM warmup | 50 epochs | Flow matching activation delay |
+| FM weight | 0.1 | Flow loss coefficient |
 | Gradient clipping | 10.0 | All models |
-| DPMM warmup ratio | 0.9 | DPMM series only |
-| KL weight | 0.1 | Topic & VAE series |
 
-## Evaluation Metrics
+## Evaluation
 
-### Clustering
-- **NMI** — Normalised Mutual Information
-- **ARI** — Adjusted Rand Index
-- **ASW** — Average Silhouette Width
-- **DAV** — Davies–Bouldin Index (lower is better)
-- **CAL** — Calinski–Harabasz Index
-
-### DRE (Dimensionality Reduction Evaluation)
-Evaluates structure preservation (embedding, UMAP, t-SNE) using co-ranking matrices.
-
-### LSE (Latent Space Evaluation)
-Evaluates intrinsic latent-space properties (structure, trajectory).
-
-### Visualisation Output
-- **UMAP grids** — coloured by true labels & model
-- **Horizontal bar charts** — grouped by metric family (6 panels)
-- **Heatmap** — compact normalised overview of all models × metrics
+- **Clustering**: NMI, ARI, ASW, DAV, CAL, COR
+- **DRE**: Dimensionality reduction evaluation (UMAP/t-SNE structure preservation)
+- **LSE**: Latent space evaluation (intrinsic properties)
+- **DREX/LSEX**: Extended metric variants
+- **Composite**: (NMI + ARI + ASW) / 3
 
 ## Data Format
 
-Input: AnnData (`.h5ad`) with:
-- Raw counts in `adata.X` or `adata.layers['counts']`
-- Optional labels in `adata.obs['cell_type']` or `adata.obs['clusters']`
-
-## Configuration
-
-Benchmark defaults are defined in [benchmarks/config.py](benchmarks/config.py).
-
-## Development Workflow
-
-- Keep the main repository on `main` for stable, release-ready code.
-- Use `develop` as the integration branch for ongoing work.
-- Create short-lived `feature/*` branches from `develop` and merge them back there.
-- Attach every git worktree to a named branch. Because git does not allow the same branch to be checked out in multiple worktrees at once, extra worktrees should use distinct `feature/*` branches rather than staying detached.
-- Generated experiment outputs and benchmark exports under `experiments/results/`, `lightning_logs/`, and selected `benchmarks/benchmark_results/` paths are ignored and should be regenerated, not committed.
-
-See [docs/BRANCHING.md](docs/BRANCHING.md) for the full workflow.
-
----
-
-## Changelog
-
-### v2.0 (2025-02-08)
-- **Consolidated benchmark**: merged 3 separate scripts (`benchmark_base.py`, `benchmark_base_contrastive.py`, `benchmark_attention.py`) into a single `benchmark_base.py` handling all 12 variants.
-- **Added 4 standalone ablation variants**: Pure-Transformer-AE, Pure-Contrastive-AE, Pure-Transformer-VAE, Pure-Contrastive-VAE — isolate Transformer / contrastive contributions without DPMM or Topic heads.
-- **Hyperparameter audit & unification**: fixed `kl_weight` (0.01→0.1 for Topic series), added `dpmm_warmup_ratio=0.9` to DPMM-Transformer & DPMM-Contrastive, unified gradient clipping to 10.0 across all models.
-- **Visualisation overhaul** (`utils/viz.py`):
-  - Removed redundant `plot_metrics_comparison`; consolidated 9→6 metric panels.
-  - Switched to horizontal bar charts for readability with 12 models.
-  - Added `plot_metrics_heatmap` for compact cross-model comparison.
-  - Publication-quality fonts (DejaVu Sans, 12 pt) and 12-colour palette.
-- **Removed GAT models** (`dpmm_gat.py`, `topic_gat.py`) — retired from the benchmark.
-- **Cleaned up**: removed archive notebooks, stale cache files, backup files, and orphaned `__pycache__` entries.
-
-### v1.0 (2025-01-29)
-- Initial 8-model benchmark (DPMM × {Base, Transformer, GAT, Contrastive} + Topic × {Base, Transformer, GAT, Contrastive}).
-- Separate benchmark scripts per model group.
-- DRE + LSE evaluation metrics.
+Input: AnnData (`.h5ad`) with raw counts in `adata.X`, labels in `adata.obs['cell_type']`.
+Preprocessing: top 3000 HVGs, library-size normalization, log(1+x), subsample to 3000 cells.

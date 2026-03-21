@@ -6,7 +6,7 @@ across representative datasets × prior models.
 Data source: experiments/results/ (bio-validation enrichment data)
 
 Usage:
-    python -m refined_figures.fig09_enrichment --series dpmm
+    python -m refined_figures.fig09_enrichment
 """
 
 import argparse
@@ -27,7 +27,7 @@ from src.visualization import (
     bind_figure_region, LayoutRegion)
 from benchmarks.figure_generators.common import (
     MODEL_SHORT_NAMES, REPRESENTATIVE_DATASETS,
-    PRIOR_MODELS_DPMM, PRIOR_MODELS_TOPIC, BIO_RESULTS)
+    PRIOR_MODELS_TOPIC, BIO_RESULTS)
 
 DPI = 300
 
@@ -156,7 +156,7 @@ def _draw_enrichment_dotplot(ax, enrich_df, title, top_n=15):
     df["_neg_log_p"] = -np.log10(df[pval_col].clip(lower=1e-300))
     terms = df[term_col].values
     # Truncate long term names
-    terms = [t[:45] + "…" if len(str(t)) > 45 else str(t) for t in terms]
+    terms = [t[:50] + "..." if len(str(t)) > 50 else str(t) for t in terms]
     y_pos = np.arange(len(terms))
 
     sizes = 40
@@ -168,7 +168,7 @@ def _draw_enrichment_dotplot(ax, enrich_df, title, top_n=15):
                     c=df["_neg_log_p"].values, cmap="YlOrRd",
                     edgecolors="black", linewidths=0.3, zorder=5)
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(terms, fontsize=7)
+    ax.set_yticklabels(terms, fontsize=6)
     ax.set_xlabel("-log₁₀(p)", fontsize=9)
     ax.set_title(title, fontsize=10, pad=3, loc="left", fontweight="normal")
     ax.invert_yaxis()
@@ -182,15 +182,14 @@ def generate(out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
     apply_style()
 
-    prior_models = (PRIOR_MODELS_DPMM if series == "dpmm"
-                    else PRIOR_MODELS_TOPIC)
+    prior_models = PRIOR_MODELS_TOPIC
     datasets = REPRESENTATIVE_DATASETS
     n_rows = len(datasets)
     n_cols = len(prior_models)
 
-    fig = plt.figure(figsize=(17.0, 5.5 * n_rows + 1.0))
+    fig = plt.figure(figsize=(17.0, 6.5 * n_rows + 1.0))
     root = bind_figure_region(fig, (0.12, 0.04, 0.96, 0.95))
-    grid = root.grid(n_rows, n_cols, wgap=0.06, hgap=0.06)
+    grid = root.grid(n_rows, n_cols, wgap=0.06, hgap=0.08)
 
     for r_idx, ds in enumerate(datasets):
         for c_idx, model in enumerate(prior_models):

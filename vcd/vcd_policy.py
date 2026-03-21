@@ -1,4 +1,4 @@
-"""Figure-quality policy for CLOP-DiT publication figures.
+"""Figure-quality policy for PanODE-Topic publication figures.
 
 Encodes typography, spacing, density, legend, and truncation rules that
 every generated panel must satisfy before it is considered publication-ready.
@@ -18,7 +18,7 @@ from typing import Dict, List, Optional, Tuple
 class FigurePolicy:
     """Central knob-file for every visual-conflict rule.
 
-    Instantiate with defaults for the CLOP-DiT paper, or override individual
+    Instantiate with defaults for the PanODE-Topic paper, or override individual
     fields for a different publication style.
     """
 

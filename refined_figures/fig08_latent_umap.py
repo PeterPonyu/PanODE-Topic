@@ -25,7 +25,7 @@ from src.visualization import (
     bind_figure_region, LayoutRegion, add_colorbar_safe)
 from benchmarks.figure_generators.common import (
     MODEL_SHORT_NAMES, compute_umap,
-    PRIOR_MODELS_DPMM, PRIOR_MODELS_TOPIC,
+    PRIOR_MODELS_TOPIC,
     REPRESENTATIVE_DATASETS, BIO_RESULTS)
 
 DPI = 300
@@ -86,8 +86,7 @@ def generate(out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
     apply_style()
 
-    prior_models = (PRIOR_MODELS_DPMM if series == "dpmm"
-                    else PRIOR_MODELS_TOPIC)
+    prior_models = PRIOR_MODELS_TOPIC
     datasets = REPRESENTATIVE_DATASETS
     n_ds = len(datasets)
     n_models = len(prior_models)

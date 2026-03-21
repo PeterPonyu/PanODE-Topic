@@ -6,7 +6,7 @@ representative datasets × prior models.
 Data source: benchmarks/biological_validation/results/
 
 Usage:
-    python -m refined_figures.fig07_correlation --series dpmm
+    python -m refined_figures.fig07_correlation
 """
 
 import argparse
@@ -25,7 +25,7 @@ from src.visualization import (
     bind_figure_region, LayoutRegion, add_colorbar_safe)
 from benchmarks.figure_generators.common import (
     MODEL_SHORT_NAMES, REPRESENTATIVE_DATASETS,
-    PRIOR_MODELS_DPMM, PRIOR_MODELS_TOPIC, BIO_RESULTS)
+    PRIOR_MODELS_TOPIC, BIO_RESULTS)
 
 DPI = 300
 
@@ -80,7 +80,9 @@ def _draw_corr_heatmap(ax, corr, genes, title, top_n=30):
     ax.set_yticks(range(n_comp))
     ax.set_yticklabels([f"z{i}" for i in range(n_comp)], fontsize=8)
     ax.set_xticks(range(len(gene_sub)))
-    ax.set_xticklabels(gene_sub, fontsize=6, rotation=90, ha="center")
+    # Thin labels: show every 3rd gene name to avoid overlap
+    labels = [g if i % 3 == 0 else "" for i, g in enumerate(gene_sub)]
+    ax.set_xticklabels(labels, fontsize=5, rotation=90, ha="center")
     ax.set_title(title, fontsize=10, pad=3, loc="left", fontweight="normal")
     add_colorbar_safe(im, ax=ax, shrink=0.6, pad=0.02, label="Pearson r")
 
@@ -92,8 +94,7 @@ def generate(out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
     apply_style()
 
-    prior_models = (PRIOR_MODELS_DPMM if series == "dpmm"
-                    else PRIOR_MODELS_TOPIC)
+    prior_models = PRIOR_MODELS_TOPIC
     datasets = REPRESENTATIVE_DATASETS
     n_rows = len(datasets)
     n_cols = len(prior_models)

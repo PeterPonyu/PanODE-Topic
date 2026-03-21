@@ -5,7 +5,7 @@ Produces gene importance heatmaps across representative datasets and models.
 Data source: benchmarks/biological_validation/results/
 
 Usage:
-    python -m refined_figures.fig06_biological --series dpmm
+    python -m refined_figures.fig06_biological
 """
 
 import argparse
@@ -25,7 +25,7 @@ from src.visualization import (
     bind_figure_region, LayoutRegion, add_colorbar_safe)
 from benchmarks.figure_generators.common import (
     MODEL_SHORT_NAMES, REPRESENTATIVE_DATASETS,
-    PRIOR_MODELS_DPMM, PRIOR_MODELS_TOPIC, BIO_RESULTS)
+    PRIOR_MODELS_TOPIC, BIO_RESULTS)
 
 DPI = 300
 
@@ -82,7 +82,9 @@ def _draw_gene_heatmap(ax, importance_df, title, top_n=30):
     im = ax.imshow(vals, aspect="auto", cmap="YlOrRd")
     ax.set_yticks([])
     ax.set_xticks(range(len(genes)))
-    ax.set_xticklabels(genes, fontsize=7, rotation=90, ha="center")
+    # Thin labels: show every 3rd gene name to avoid overlap
+    labels = [g if i % 3 == 0 else "" for i, g in enumerate(genes)]
+    ax.set_xticklabels(labels, fontsize=5, rotation=90, ha="center")
     ax.set_title(title, fontsize=10, pad=3, loc="left", fontweight="normal")
     add_colorbar_safe(im, ax=ax, shrink=0.5, pad=0.02, label="Score")
 
@@ -94,8 +96,7 @@ def generate(out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
     apply_style()
 
-    prior_models = (PRIOR_MODELS_DPMM if series == "dpmm"
-                    else PRIOR_MODELS_TOPIC)
+    prior_models = PRIOR_MODELS_TOPIC
     datasets = REPRESENTATIVE_DATASETS
     n_rows = len(datasets)
     n_cols = len(prior_models)

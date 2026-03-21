@@ -24,7 +24,8 @@ def weight_init(m):
     """Xavier normal initialization for linear layers."""
     if isinstance(m, nn.Linear):
         nn.init.xavier_normal_(m.weight)
-        nn.init.constant_(m.bias, 0.01)
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0.01)
 
 
 class _Act(nn.Module):
@@ -159,8 +160,7 @@ class TopicAutoEncoder(nn.Module):
         encoder_norm: str = "bn",
         encoder_drop: float = 0.0,
         use_bottleneck: bool = False,
-        bottleneck_dim: Optional[int] = None,
-        ode_hidden: int = 64):
+        bottleneck_dim: Optional[int] = None):
         super().__init__()
         self.n_words = n_words
         self.n_topics = n_topics
@@ -279,8 +279,7 @@ class TopicODEModel(PriorMixin, ReconstructionLossMixin, BaseModel):
             encoder_norm=encoder_norm,
             encoder_drop=encoder_drop,
             use_bottleneck=use_bottleneck,
-            bottleneck_dim=bottleneck_dim,
-            ode_hidden=ode_hidden)
+            bottleneck_dim=bottleneck_dim)
         
         # Priors (logistic-normal approximation of Dirichlet)
         if cell_topic_prior is None:

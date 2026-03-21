@@ -19,16 +19,18 @@ from pathlib import Path
 from collections import defaultdict
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-BASE = Path("/home/zeyufu/Desktop/PanODE-LAB/experiments/results/external")
+_PROJECT_ROOT = Path(__file__).resolve().parent
+BASE = _PROJECT_ROOT / "experiments" / "results" / "topic_vs_external"
 GROUPS = ["gaussian_geometric", "disentanglement", "graph_contrastive", "scvi_family", "generative"]
 
-OUT_BASE = Path("/home/zeyufu/Desktop/PanODE-LAB/experiments/results/external_full")
+OUT_BASE = _PROJECT_ROOT / "experiments" / "results" / "external_full"
 OUT_TABLES = OUT_BASE / "tables"
 OUT_SERIES = OUT_BASE / "series"
 
-# ── Create output dirs ─────────────────────────────────────────────────────────
-OUT_TABLES.mkdir(parents=True, exist_ok=True)
-OUT_SERIES.mkdir(parents=True, exist_ok=True)
+if __name__ == "__main__":
+    # ── Create output dirs ────────────────────────────────────────────────────
+    OUT_TABLES.mkdir(parents=True, exist_ok=True)
+    OUT_SERIES.mkdir(parents=True, exist_ok=True)
 
 # ── Helper: discover and merge ─────────────────────────────────────────────────
 def merge_subdirectory(subdir_name: str, out_dir: Path) -> dict:

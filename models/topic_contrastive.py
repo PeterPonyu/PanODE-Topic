@@ -29,7 +29,8 @@ def weight_init(m):
     """Xavier normal initialization for linear layers."""
     if isinstance(m, nn.Linear):
         nn.init.xavier_normal_(m.weight)
-        nn.init.constant_(m.bias, 0.01)
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0.01)
 
 
 class _Act(nn.Module):
@@ -626,7 +627,6 @@ class TopicODEContrastiveModel(PriorMixin, ReconstructionLossMixin, BaseModel):
             encoder_drop=encoder_drop,
             use_bottleneck=use_bottleneck,
             bottleneck_dim=bottleneck_dim,
-            ode_hidden=ode_hidden,
             use_moco=use_moco,
             moco_embedding_dim=moco_embedding_dim,
             moco_queue_size=moco_queue_size,
