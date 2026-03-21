@@ -1,0 +1,100 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Environment ──────────────────────────────────────────────────────────────
+.conda/
+.venv/
+.env
+
+# ── IDE / editor ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Node / Next.js ───────────────────────────────────────────────────────────
+node_modules/
+.next/
+model-arch-viewer/out/
+model-arch-viewer/public/subplots/
+model-arch-viewer/package-lock.json
+
+# ── Global binary / generated output exclusions ──────────────────────────────
+# Only source code should be tracked; all generated outputs are excluded.
+*.png
+*.pdf
+*.eps
+*.tiff
+*.npz
+*.pt
+*.h5ad
+*.log
+*.jsonl
+
+# ── Benchmark artifacts (all regenerable) ────────────────────────────────────
+benchmarks/benchmark_results/
+benchmarks/training_dynamics_results/
+benchmarks/biological_validation/results/
+benchmarks/paper_figures/
+benchmarks/refined_figures/output/
+
+# ── Experiment results (all regenerable) ─────────────────────────────────────
+experiments/results/
+
+# ── Refined figure outputs ───────────────────────────────────────────────────
+refined_figures/output/
+
+# ── Scripts logs ─────────────────────────────────────────────────────────────
+scripts/parallel_logs/
+
+# ── Legacy / archived ────────────────────────────────────────────────────────
+benchmarks/benchmark_results/_legacy/
+
+# ── Font files (large binaries) ──────────────────────────────────────────────
+fonts/
+
+# ── LaTeX compilation artifacts ──────────────────────────────────────────────
+article/**/*.aux
+article/**/*.bbl
+article/**/*.blg
+article/**/*.out
+article/**/*.synctex.gz
+article/**/*.fls
+article/**/*.fdb_latexmk
+article/**/*.toc
+article/**/*.lof
+article/**/*.lot
+article/**/*.nav
+article/**/*.snm
+article/**/*.vrb
+article/**/*.run.xml
+article/**/*.bcf
+
+# ── Article generated assets (only source .tex + .bib tracked) ──────────────
+article/README.md
+benchmarks/README.md
+
+# ── VCD live check outputs ───────────────────────────────────────────────────
+**/_live_vcd/
+
+# ── Metrics results ──────────────────────────────────────────────────────────
+metrics/latent_extensions/results/
+
+# ── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Lightning logs ───────────────────────────────────────────────────────────
+lightning_logs/
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Claude Code ─────────────────────────────────────────────────────────────
+.claude/

@@ -1,0 +1,17 @@
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{$k$NN downstream classification (Topic series).} Mean accuracy and macro-F1 across 12 datasets. Best value per column in bold.}
+\label{tab:topic_knn}
+\begin{tabular}{lcc}
+\toprule
+Model & Accuracy & F1-macro \\
+\midrule
+Topic-Transformer & \textbf{0.733} & \textbf{0.517} \\
+Topic-Base & 0.729 & 0.506 \\
+Topic-Contrastive & 0.728 & 0.488 \\
+Pure-VAE & 0.646 & 0.405 \\
+Pure-Transformer-VAE & 0.617 & 0.368 \\
+Pure-Contrastive-VAE & 0.603 & 0.355 \\
+\bottomrule
+\end{tabular}
+\end{table}

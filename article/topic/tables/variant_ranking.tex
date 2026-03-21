@@ -1,0 +1,17 @@
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{Individual variant ranking (Topic series).} Models ranked by composite score across 56 datasets. Best value per column in bold.}
+\label{tab:topic_variant_ranking}
+\begin{tabular}{lccccc}
+\toprule
+Model & NMI & ARI & ASW & DAV $\downarrow$ & Score \\
+\midrule
+Topic-Transformer & \textbf{0.569} & \textbf{0.342} & \textbf{0.458} & 0.828 & \textbf{0.457} \\
+Topic-Contrastive & 0.560 & 0.335 & 0.418 & \textbf{0.801} & 0.438 \\
+Topic-Base & 0.562 & 0.324 & 0.416 & 0.897 & 0.434 \\
+Pure-VAE & 0.456 & 0.230 & 0.359 & 0.855 & 0.348 \\
+Pure-Transformer-VAE & 0.457 & 0.252 & 0.321 & 0.921 & 0.343 \\
+Pure-Contrastive-VAE & 0.397 & 0.160 & 0.231 & 1.184 & 0.263 \\
+\bottomrule
+\end{tabular}
+\end{table}
