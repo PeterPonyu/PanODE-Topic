@@ -211,16 +211,7 @@ The Dirichlet prior affords a dual-pathway biological validation unavailable to 
 We validate both pathways on three representative datasets (setty, endo, dentate). Perturbation importance and decoder $\beta$ weights independently identify distinct gene sets per topic: $Z$-scored importance heatmaps reveal non-overlapping gene modules across topics, and the decoder $\beta$ rows show sparse, complementary activation patterns. Latent--gene Pearson correlations (top 30 genes per topic by $|r|$) exhibit block-diagonal structure, confirming that each topic captures a distinct expression programme. Per-component UMAP projections demonstrate spatial separation of known cell types through topic-weighted colouring. Gene Ontology enrichment analysis~\cite{ashburner2000gene} on the top 20 salient genes per topic yields significant biological-process terms (Fisher's exact test, Bonferroni-corrected $p < 0.05$) under both the perturbation and decoder-$\beta$ pathways, providing convergent evidence that the learned topics correspond to coherent gene regulatory programmes.
 
 \subsection{External Benchmark}
-Figure~\ref{fig:external} compares the proposed Topic-FM variants on the full 34-metric grid when evaluated alongside 23 external baselines.
-
-\begin{figure}[p]
-\centering
-\includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{vs_external/figures/proposed/uniform_grid}%
-\caption{\textbf{Proposed-model metric profiles in the external benchmark context.} All 34 metrics on a uniform grid for the four Topic-FM variants across 16 core datasets; boxplots show per-dataset distributions with significance brackets. Abbreviated x-axis labels: TFM-Base = Topic-FM-Base, TFM-Trans = Topic-FM-Transformer, TFM-Contr = Topic-FM-Contrastive.}
-\label{fig:external}
-\end{figure}
-
-Table~\ref{tab:topic_external_winrate} quantifies external win rates via Wilcoxon signed-rank tests.
+The metric profiles of the four Topic-FM variants remain consistent when evaluated alongside 23 external baselines on 16 core datasets (the same ranking pattern as in the internal ablation of Figure~\ref{fig:ablation}). Table~\ref{tab:topic_external_winrate} quantifies external win rates via Wilcoxon signed-rank tests.
 
 \input{tables/external_winrate}
 
