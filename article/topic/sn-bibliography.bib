@@ -10,8 +10,17 @@
 }
 
 % ═══════════════════════════════════════════════════════════════════════════════
-% Neural Topic Models & Dirichlet VAEs
+% Topic Models (Classical & Neural)
 % ═══════════════════════════════════════════════════════════════════════════════
+
+@article{blei2003latent,
+  title={Latent {Dirichlet} Allocation},
+  author={Blei, David M and Ng, Andrew Y and Jordan, Michael I},
+  journal={Journal of Machine Learning Research},
+  volume={3},
+  pages={993--1022},
+  year={2003}
+}
 
 @inproceedings{miao2016neural,
   title={Neural Variational Inference for Text Processing},
@@ -28,6 +37,17 @@
   year={2017}
 }
 
+@article{zhao2021scetm,
+  title={Learning Interpretable Cellular and Gene Signature Embeddings from Single-Cell Transcriptomic Data},
+  author={Zhao, Yingyu and Cai, Hao and Zhang, Zuobai and Tang, Jian and Li, Yue},
+  journal={Nature Communications},
+  volume={12},
+  number={1},
+  pages={5261},
+  year={2021},
+  publisher={Nature Publishing Group}
+}
+
 % ═══════════════════════════════════════════════════════════════════════════════
 % Flow Matching & Optimal Transport
 % ═══════════════════════════════════════════════════════════════════════════════
@@ -39,10 +59,10 @@
   year={2023}
 }
 
-@inproceedings{tong2024improving,
+@article{tong2024improving,
   title={Improving and Generalizing Flow-Based Generative Models with Minibatch Optimal Transport},
   author={Tong, Alexander and Malkin, Nikolay and Huguet, Guillaume and Zhang, Yanlei and {Rector-Brooks}, Jarrid and Fatras, Kilian and Wolf, Guy and Bengio, Yoshua},
-  booktitle={Transactions on Machine Learning Research (TMLR)},
+  journal={Transactions on Machine Learning Research (TMLR)},
   year={2024}
 }
 
@@ -115,12 +135,12 @@
 
 @article{li2023scdac,
   title={{scDAC}: Deep Adaptive Clustering of Single-Cell Transcriptomic Data with Coupled Autoencoder and {Dirichlet} Process Mixture Model},
-  author={Li, Sijing and others},
+  author={An, Sijing and Shi, Jinhui and Liu, Runyan and Chen, Yaohua and Wang, Jing and Hu, Shuguang and Xia, Xiaohua and Dong, Guohua},
   journal={Bioinformatics},
-  volume={39},
-  number={10},
-  pages={btad577},
-  year={2023},
+  volume={40},
+  number={4},
+  pages={btae198},
+  year={2024},
   publisher={Oxford University Press}
 }
 
@@ -214,4 +234,28 @@
   pages={80--83},
   year={1945},
   publisher={JSTOR}
+}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+% Single-Cell VAEs & Interpretable Representation Learning
+% ═══════════════════════════════════════════════════════════════════════════════
+
+@article{gronbech2020scvae,
+  title={{scVAE}: Variational Auto-Encoders for Single-Cell Gene Expression Data},
+  author={Gr{\o}nbech, Christopher Heje and Vording, Maximillian F and Timshel, Pascal N and S{\o}nderby, Casper Kaae and Pers, Tune H and Winther, Ole},
+  journal={Bioinformatics},
+  volume={36},
+  number={16},
+  pages={4415--4422},
+  year={2020},
+  publisher={Oxford University Press}
+}
+
+@article{moinfar2024drvi,
+  title={Disentangling Cellular Heterogeneity into Interpretable Biological Factors through Structured Latent Representations},
+  author={Moinfar, Amirali Aghajan and Theis, Fabian J},
+  journal={bioRxiv},
+  pages={2024.11.06.622266},
+  year={2024},
+  publisher={Cold Spring Harbor Laboratory}
 }
