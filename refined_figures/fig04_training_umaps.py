@@ -69,7 +69,7 @@ def _draw_kmeans_umap(ax, latent, title, n_clusters=8):
                rasterized=True)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_title(title, fontsize=9, pad=2, loc="left", fontweight="normal")
+    ax.set_title(title, fontsize=8, pad=3, loc="left", fontweight="normal")
     for sp in ax.spines.values():
         sp.set_linewidth(0.3)
 
@@ -117,14 +117,14 @@ def generate(out_dir):
     ds = REPRESENTATIVE_DATASETS[0] if REPRESENTATIVE_DATASETS else "setty"
     n_rows = len(panels)
     n_cols = max(len(p[2]) for p in panels)
-    figw, figh = 17.0, 1.6 * n_rows + 0.3
+    figw, figh = 17.0, 1.8 * n_rows + 0.3
 
     fig = plt.figure(figsize=(figw, figh))
     root = bind_figure_region(fig, (0.04, 0.03, 0.97, 0.96))
-    row_regions = root.split_rows(n_rows, gap=0.01)
+    row_regions = root.split_rows(n_rows, gap=0.02)
 
     for r_idx, (source, param, vals) in enumerate(panels):
-        col_regions = row_regions[r_idx].split_cols(n_cols, gap=0.01)
+        col_regions = row_regions[r_idx].split_cols(n_cols, gap=0.015)
         # Load all sweep latents for this source+series, filtered by dataset
         latent_tuples = load_sweep_latents(source, series,
                                            dataset_filter=ds)

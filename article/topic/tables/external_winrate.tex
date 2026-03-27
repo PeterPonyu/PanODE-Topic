@@ -1,7 +1,10 @@
 \begin{table}[!htbp]
 \centering
-\caption{\textbf{External win-rate summary (Topic-FM series).} Each variant is compared against 23 external baselines via Wilcoxon signed-rank tests across 56 datasets. Core win rate = fraction of core-metric comparisons significantly won. Best value per column in bold.}
+\caption{\textbf{External win-rate summary (Topic-FM series).} Each variant is compared against 23 external baselines via Wilcoxon signed-rank tests across 56 datasets. Core win rate denotes the fraction of significant wins on the core metrics. Best value per column is shown in bold.}
 \label{tab:topic_external_winrate}
+\setlength{\tabcolsep}{5pt}
+\small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 Model & Total tests & Sig.\ (all) & Core sig. & Core total & Core win rate \\
@@ -14,4 +17,5 @@ Pure-Transformer-VAE & 407 & 177 & 27 & 44 & 0.614 \\
 Pure-Contrastive-VAE & 407 & 148 & 26 & 44 & 0.591 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}

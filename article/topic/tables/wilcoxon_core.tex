@@ -2,6 +2,9 @@
 \centering
 \caption{\textbf{Wilcoxon signed-rank tests on core metrics (Topic-FM series).} Pairwise structured vs.\ pure comparisons across 12 core datasets. W/L/T = wins/losses/ties; Sig.\ at $\alpha{=}0.05$.}
 \label{tab:topic_wilcoxon_core}
+\setlength{\tabcolsep}{4pt}
+\footnotesize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llccccc}
 \toprule
 Structured vs Pure & Metric & W/L/T & $p$-value & Sig. & Cliff's $\delta$ & Effect \\
@@ -20,4 +23,5 @@ Topic-FM-Transformer vs Pure-Transformer-VAE & DAV & 7/5/0 & 0.259 & No & 0.222 
 Topic-FM-Transformer vs Pure-Transformer-VAE & NMI & 11/1/0 & 4.88e-04 & Yes & 0.611 & large \\
 \bottomrule
 \end{tabular}
+}
 \end{table}

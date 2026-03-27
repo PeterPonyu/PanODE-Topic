@@ -99,6 +99,33 @@ except ImportError:
 DEFAULT_PALETTE = "husl"
 RESULTS_ROOT = Path(PROJECT_ROOT) / "experiments" / "results"
 
+# Short display names for x-tick labels to prevent row overlap in grid figures.
+# Full names are kept in method_names (data columns); only the rendered ticks
+# are shortened.
+TICK_SHORT_NAMES: dict[str, str] = {
+    "Topic-FM-Base":        "TFM-Base",
+    "Topic-FM-Transformer": "TFM-Trans",
+    "Topic-FM-Contrastive": "TFM-Contr",
+    "Pure-Trans-VAE":       "Pure-T-VAE",
+    "Pure-Contr-VAE":       "Pure-C-VAE",
+}
+
+
+def _shorten_tick_labels(axes):
+    """Replace long method names on x-tick labels with shorter versions."""
+    for ax in (axes if hasattr(axes, '__iter__') else [axes]):
+        new_labels = []
+        changed = False
+        for lab in ax.get_xticklabels():
+            txt = lab.get_text()
+            short = TICK_SHORT_NAMES.get(txt, txt)
+            if short != txt:
+                changed = True
+            new_labels.append(short)
+        if changed:
+            ax.set_xticks(ax.get_xticks())
+            ax.set_xticklabels(new_labels)
+
 def _per_row_height(n_methods: int) -> float:
     """Thin wrapper over layout.per_row_height for local readability."""
     return per_row_height(n_methods)
@@ -265,6 +292,9 @@ def generate_per_group_figures(
     _apply_font("Arial")
     os.makedirs(figures_dir, exist_ok=True)
 
+    # Build display labels for spacing calculations
+    display_labels = [TICK_SHORT_NAMES.get(m, m) for m in method_names]
+
     # When all_method_names is provided the CSVs contain more methods than
     # what we want to plot.  Pass the full list to the analyzer and select
     # a subset for display.
@@ -274,12 +304,14 @@ def generate_per_group_figures(
             method_names=all_method_names,
             selected_methods=method_names,
             method_order=method_names,
+            method_display_names=TICK_SHORT_NAMES,
             verbose=False)
     else:
         analyzer = RigorousExperimentalAnalyzer(
             data_folder_path=tables_dir,
             method_names=method_names,
             method_order=method_names,
+            method_display_names=TICK_SHORT_NAMES,
             verbose=False)
     analyzer.load_experimental_data()
     analyzer.preprocess_data()
@@ -299,9 +331,9 @@ def generate_per_group_figures(
 
         # Safety: warn if labels are likely to overlap
         assert_no_label_overlap(
-            method_names, fig_w, ncols, xtick_fs, rot)
+            display_labels, fig_w, ncols, xtick_fs, rot)
 
-        hspace = _compute_hspace(method_names, rot, xtick_fs,
+        hspace = _compute_hspace(display_labels, rot, xtick_fs,
                                  title_fontsize, fig_h)
 
         save_path = Path(figures_dir) / f"{group_key}.pdf"
@@ -313,6 +345,7 @@ def generate_per_group_figures(
                 analyzer,
                 metrics=grp_metrics,
                 metric_display_names=grp_display,
+                method_display_names=TICK_SHORT_NAMES,
                 figsize=(fig_w, fig_h),
                 ncols=ncols,
                 save_path=str(save_path),
@@ -390,19 +423,24 @@ def generate_uniform_grid_figure(
     _apply_font("Arial")
     os.makedirs(figures_dir, exist_ok=True)
 
-    # Build analyzer
+    # Build display names: use SHORT labels for ticks, FULL names for data
+    display_labels = [TICK_SHORT_NAMES.get(m, m) for m in method_names]
+
+    # Build analyzer with native display name support
     if all_method_names is not None:
         analyzer = RigorousExperimentalAnalyzer(
             data_folder_path=tables_dir,
             method_names=all_method_names,
             selected_methods=method_names,
             method_order=method_names,
+            method_display_names=TICK_SHORT_NAMES,
             verbose=False)
     else:
         analyzer = RigorousExperimentalAnalyzer(
             data_folder_path=tables_dir,
             method_names=method_names,
             method_order=method_names,
+            method_display_names=TICK_SHORT_NAMES,
             verbose=False)
     analyzer.load_experimental_data()
     analyzer.preprocess_data()
@@ -427,7 +465,8 @@ def generate_uniform_grid_figure(
     fig_w = FIG_WIDTH_PER_METRIC * ncols
     fig_h = row_h * nrows + 3.0
 
-    hspace = _compute_hspace(method_names, rot, xtick_fs,
+    # Compute hspace using SHORT display labels for accurate spacing
+    hspace = _compute_hspace(display_labels, rot, xtick_fs,
                              title_fontsize, row_h)
 
     save_path = Path(figures_dir) / "uniform_grid.pdf"
@@ -439,6 +478,7 @@ def generate_uniform_grid_figure(
             analyzer,
             metrics=all_metrics,
             metric_display_names=all_display,
+            method_display_names=TICK_SHORT_NAMES,
             figsize=(fig_w, fig_h),
             ncols=ncols,
             save_path=str(save_path),

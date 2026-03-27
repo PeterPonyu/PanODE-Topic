@@ -23,24 +23,28 @@
 \raggedbottom
 \setlength{\headheight}{20pt}
 
-% Float spacing — balanced between compactness and readability
-\setlength{\textfloatsep}{14pt plus 4pt minus 2pt}
-\setlength{\floatsep}{12pt plus 4pt minus 2pt}
-\setlength{\intextsep}{12pt plus 4pt minus 2pt}
-\setlength{\abovecaptionskip}{6pt}
-\setlength{\belowcaptionskip}{4pt}
+% Float spacing — compact for minimum whitespace
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{2pt}
 
 \AtBeginDocument{%
-  \setlength{\abovedisplayskip}{8pt plus 3pt minus 2pt}%
-  \setlength{\belowdisplayskip}{8pt plus 3pt minus 2pt}%
-  \setlength{\abovedisplayshortskip}{4pt plus 2pt minus 1pt}%
-  \setlength{\belowdisplayshortskip}{4pt plus 2pt minus 1pt}%
+  \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\abovedisplayshortskip}{3pt plus 1pt minus 1pt}%
+  \setlength{\belowdisplayshortskip}{3pt plus 1pt minus 1pt}%
 }
 
-\titlespacing{\section}{0pt}{12pt}{4pt}
-\titlespacing{\subsection}{0pt}{10pt}{3pt}
-\titlespacing{\subsubsection}{0pt}{8pt}{3pt}
-\titlespacing{\paragraph}{0pt}{6pt}{2pt}
+\titlespacing{\section}{0pt}{10pt}{3pt}
+\titlespacing{\subsection}{0pt}{8pt}{2pt}
+\titlespacing{\subsubsection}{0pt}{6pt}{2pt}
+\titlespacing{\paragraph}{0pt}{4pt}{2pt}
+
+\newcommand{\panfullfig}[2][]{%
+  \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio,#1]{#2}%
+}
 
 %=================================================================
 % Figure paths: benchmark subplots (Figs 1,3-9) and experiment results (Fig 10)
@@ -119,9 +123,9 @@ The composite score used for ranking is $\text{Score} = (\text{NMI} + \text{ARI}
 \subsection{Architecture Overview}
 Figure~\ref{fig:arch} shows the four Topic-FM architectures with the shared flow matching refinement module.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{Fig1_arch_topic}
+\panfullfig{Fig1_arch_topic}
 \caption{\textbf{Topic-FM architecture overview.} Four architectural variants share a common Dirichlet-prior VAE backbone ($n_\text{topics}$ = 10) with flow matching refinement in pre-softmax $\mathbb{R}^K$ space. (a)~Topic-FM-Base with MLP encoder; (b)~Topic-FM-Transformer with self-attention encoder; (c)~Topic-FM-Contrastive with MoCo contrastive head; (d)~Topic-FM-GAT with graph attention encoder over $k$NN. Dashed pink box indicates the shared flow matching module.}
 \label{fig:arch}
 \end{figure}
@@ -129,10 +133,13 @@ Figure~\ref{fig:arch} shows the four Topic-FM architectures with the shared flow
 \subsection{Full-Catalogue Performance}
 Table~\ref{tab:topic_refresh} summarises mean performance across the 56-dataset catalogue.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{\textbf{56-dataset summary.} Mean metric values across the full catalogue. Higher is better except DAV. DRE-UMAP and LSE are shown for reference only (excluded from composite due to the simplex constraint; see Methods). Composite = (NMI\,+\,ARI\,+\,ASW)\,/\,3.}
 \label{tab:topic_refresh}
+\setlength{\tabcolsep}{4.5pt}
+\small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccccc}
 \toprule
 Model & NMI & ARI & ASW & DAV$\downarrow$ & DRE-UMAP$^\dagger$ & LSE$^\dagger$ & Composite \\
@@ -142,18 +149,20 @@ Topic-FM-Base & 0.582 & 0.397 & 0.453 & 0.860 & 0.733 & 0.493 & 0.477 \\
 Topic-FM-Transformer & \textbf{0.601} & 0.410 & \textbf{0.496} & 0.810 & 0.730 & 0.492 & \textbf{0.502} \\
 Topic-FM-Contrastive & 0.596 & \textbf{0.411} & 0.462 & \textbf{0.802} & 0.746 & 0.489 & 0.490 \\
 \bottomrule
-\multicolumn{8}{l}{\footnotesize $^\dagger$DRE/LSE excluded from composite; simplex constraint limits comparability (see Methods).}
 \end{tabular}
+}
+
+\footnotesize $^\dagger$DRE/LSE excluded from composite; simplex constraint limits comparability (see Methods).
 \end{table}
 
-Topic-FM-Transformer raises NMI by 8.2\% (0.555\,$\to$\,0.601), ARI by 20.4\% (0.340\,$\to$\,0.410), and ASW by 21.7\% (0.408\,$\to$\,0.496) relative to Pure-VAE, yielding a composite gain of 15.6\% (0.434\,$\to$\,0.502). All three core metrics improve simultaneously---concordance and geometry are not traded off. Topic-FM-Contrastive achieves the best DAV (0.802) and the highest ARI (0.411), while Topic-FM-Transformer leads on NMI, ASW, and composite score.
+Topic-FM-Transformer raises NMI by 8.2\%, ARI by 20.4\%, and ASW by 21.7\% relative to Pure-VAE. Its composite score rises from 0.434 to 0.502 (+15.6\%). All three core metrics improve simultaneously---concordance and geometry are not traded off. Topic-FM-Contrastive achieves the best DAV (0.802) and the highest ARI (0.411), while Topic-FM-Transformer leads on NMI, ASW, and composite score.
 
 \subsection{Cross-Dataset Consistency}
 Figure~\ref{fig:crossdataset} shows per-dataset scatter plots of concordance versus geometry metrics.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{Fig5_crossdataset_topic}
+\panfullfig{Fig5_crossdataset_topic}
 \caption{\textbf{Cross-dataset metric relationships.} Per-dataset scatter plots for concordance--geometry pairs (NMI vs.\ ASW, NMI vs.\ DAV, ARI vs.\ ASW, ARI vs.\ DAV) across all internal models on 56 datasets. Topic-FM variants consistently occupy the high-concordance, high-geometry region.}
 \label{fig:crossdataset}
 \end{figure}
@@ -163,10 +172,10 @@ The improvement is not driven by a few favourable datasets: Topic-FM variants co
 \subsection{Internal Ablation}
 Figure~\ref{fig:ablation} presents the full ablation comparing Topic-FM variants against their matched prior-free baselines.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{ablation/figures/uniform_grid}
-\caption{\textbf{Internal ablation: Topic-FM vs.\ prior-free VAEs.} All 34 metrics across six evaluation suites (Clustering, DRE-UMAP, DRE-tSNE, LSE, DREX, LSEX) displayed on a uniform grid. Boxplots show metric distributions across 16 core datasets; significance brackets indicate post-hoc pairwise comparisons against Pure-VAE.}
+\panfullfig{ablation/figures/uniform_grid}
+\caption{\textbf{Internal ablation: Topic-FM vs.\ prior-free VAEs.} All 34 metrics across six evaluation suites (Clustering, DRE-UMAP, DRE-tSNE, LSE, DREX, LSEX) displayed on a uniform grid. Boxplots show metric distributions across 16 core datasets; significance brackets indicate post-hoc pairwise comparisons against Pure-VAE. Abbreviated x-axis labels: TFM-Base = Topic-FM-Base, TFM-Trans = Topic-FM-Transformer, TFM-Contr = Topic-FM-Contrastive.}
 \label{fig:ablation}
 \end{figure}
 
@@ -198,10 +207,10 @@ We validate both pathways on three representative datasets (setty, endo, dentate
 \subsection{External Benchmark}
 Figure~\ref{fig:external} compares the proposed Topic-FM variants on the full 34-metric grid when evaluated alongside 23 external baselines.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{vs_external/figures/proposed/uniform_grid}
-\caption{\textbf{Proposed-model metric profiles in the external benchmark context.} All 34 metrics on a uniform grid for the four Topic-FM variants across 16 core datasets; boxplots show per-dataset distributions with significance brackets.}
+\panfullfig{vs_external/figures/proposed/uniform_grid}
+\caption{\textbf{Proposed-model metric profiles in the external benchmark context.} All 34 metrics on a uniform grid for the four Topic-FM variants across 16 core datasets; boxplots show per-dataset distributions with significance brackets. Abbreviated x-axis labels: TFM-Base = Topic-FM-Base, TFM-Trans = Topic-FM-Transformer, TFM-Contr = Topic-FM-Contrastive.}
 \label{fig:external}
 \end{figure}
 

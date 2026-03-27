@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import Iterable, Sequence
 
 DEFAULT_LAYOUT_RECT: tuple[float, float, float, float] = (0.02, 0.03, 0.98, 0.95)
-DEFAULT_EXPORT_PAD_INCHES: float = 0.10
+DEFAULT_EXPORT_PAD_INCHES: float = 0.04
 
 
 def normalize_layout_rect(rect: Sequence[float] | None) -> tuple[float, float, float, float]:

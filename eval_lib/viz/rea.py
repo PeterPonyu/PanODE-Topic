@@ -262,8 +262,9 @@ class RigorousExperimentalAnalyzer:
     - 完整结果记录和可视化
     """
     
-    def __init__(self, data_folder_path, method_names, selected_methods=None, 
-                 method_order=None, verbose=True):
+    def __init__(self, data_folder_path, method_names, selected_methods=None,
+                 method_order=None, verbose=True,
+                 method_display_names=None):
         """
         初始化分析器
         
@@ -317,7 +318,13 @@ class RigorousExperimentalAnalyzer:
         # 创建方法索引映射（从原始DataFrame索引到方法名）
         method_index_map = {name:i for i, name in enumerate(self.all_method_names)}
         self.selected_indices = [method_index_map[name] for name in self.method_names]
-        
+
+        # Short display names for x-tick labels (full names kept for data indexing)
+        self.method_display_names = method_display_names or {}
+        self.display_labels = [
+            self.method_display_names.get(m, m) for m in self.method_names
+        ]
+
         # 数据存储
         self.raw_data = None
         self.processed_data = None
@@ -1549,6 +1556,11 @@ class RigorousExperimentalAnalyzer:
             plt.setp(ax.xaxis.get_majorticklabels(), rotation=xlabel_rotation, ha=xlabel_ha)
             # Slight rightward shift for rotated labels so they don't crowd left
             ax.tick_params(axis='x', pad=3)
+
+        # Apply short display labels when available
+        if self.method_display_names:
+            ax.set_xticks(range(len(self.method_names)))
+            ax.set_xticklabels(self.display_labels)
     
     
     # 新增：柱状图创建函数
@@ -2095,8 +2107,9 @@ class RigorousExperimentalAnalyzer:
 
 # ==================== 使用示例 ====================
 
-def create_publication_figure(analyzer, metrics, figsize=(16, 12), dpi=300, 
+def create_publication_figure(analyzer, metrics, figsize=(16, 12), dpi=300,
                             ncols=2, metric_display_names=None,
+                            method_display_names=None,
                             shared_y_axis=False, suptitle=None,
                             # 精确的子图布局控制
                             subplot_adjust_params=None,
@@ -2333,6 +2346,13 @@ def create_publication_figure(analyzer, metrics, figsize=(16, 12), dpi=300,
     """
     _apply_rea_style()
     import string
+
+    # Apply method display names to analyzer if provided at figure level
+    if method_display_names and not analyzer.method_display_names:
+        analyzer.method_display_names = method_display_names
+        analyzer.display_labels = [
+            method_display_names.get(m, m) for m in analyzer.method_names
+        ]
 
     n_metrics = len(metrics)
     nrows = (n_metrics + ncols - 1) // ncols

@@ -111,11 +111,11 @@ def generate(out_dir):
     n_rows = (n_pairs + n_cols - 1) // n_cols
 
     figw = 17.0
-    figh = 4.5 * n_rows + 2.0
+    figh = 3.8 * n_rows + 1.5
     fig = plt.figure(figsize=(figw, figh))
     # Leave more bottom margin (0.10) for the legend below the plots
-    root = bind_figure_region(fig, (0.06, 0.10, 0.96, 0.94))
-    grid = root.grid(n_rows, n_cols, wgap=0.04, hgap=0.06)
+    root = bind_figure_region(fig, (0.05, 0.10, 0.97, 0.96))
+    grid = root.grid(n_rows, n_cols, wgap=0.03, hgap=0.04)
 
     for idx, (x_col, y_col) in enumerate(pairs):
         r, c = divmod(idx, n_cols)

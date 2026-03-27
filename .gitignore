@@ -5,9 +5,12 @@ __pycache__/
 dist/
 build/
 *.egg
+.pytest_cache/
+.coverage
 
 # ── Environment ──────────────────────────────────────────────────────────────
 .conda/
+venv/
 .venv/
 .env
 

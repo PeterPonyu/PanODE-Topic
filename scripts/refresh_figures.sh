@@ -70,6 +70,26 @@ echo "╚═══════════════════════�
 echo ""
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# STEP 0 — Generate refined Figure 1 architecture panels
+# ═══════════════════════════════════════════════════════════════════════════════
+if printf '%s\n' "${FIGURES[@]}" | grep -qx '1'; then
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "STEP 0/5  Generating refined architecture figure (Fig 1) …"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  cd "$PROJ_ROOT"
+  for s in "${SERIES[@]}"; do
+    if [[ "$s" = "topic" ]]; then
+      /home/zeyufu/miniconda3/envs/dl/bin/python -m refined_figures.generate_all --figures 1
+    fi
+  done
+
+  echo ""
+  echo "  ✓ Figure 1 refreshed."
+  echo ""
+fi
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # STEP 1 — Generate subplot PNGs (matplotlib) for benchmark-pipeline figures
 # ═══════════════════════════════════════════════════════════════════════════════
 # Only generate subplots for figures that use the benchmark pipeline (3-4, 6-9 + 10).
@@ -77,7 +97,7 @@ echo ""
 SUBPLOT_FIGS=()
 for f in "${FIGURES[@]}"; do
   case "$f" in
-    1|2|5|11|12) ;; # skip: Fig1 manual, Fig2/11/12 experiment pipeline, Fig5 removed
+    1|2|5|11|12) ;; # skip: Fig1 refined generator, Fig2/11/12 experiment pipeline, Fig5 removed
     *) SUBPLOT_FIGS+=("$f") ;;
   esac
 done

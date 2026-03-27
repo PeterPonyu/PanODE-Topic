@@ -98,11 +98,11 @@ def per_row_height(n_methods: int) -> float:
     subplot titles, and rotated x-tick labels without overlap.
     """
     if n_methods <= 3:
-        return 2.8
+        return 3.0
     elif n_methods <= 6:
-        return 3.4
-    elif n_methods <= 8:
         return 3.8
+    elif n_methods <= 8:
+        return 4.2
     elif n_methods <= 10:
         return 4.2
     elif n_methods <= 14:
@@ -226,16 +226,18 @@ def compute_hspace(
     title_h = title_fontsize * 1.4 / 72.0
     # Base padding accounts for significance brackets above the plot
     # and prevents x-tick labels from one row touching titles below.
-    padding = 0.35
+    # Increased from 0.35 → 0.55 to eliminate row overlap with two-line
+    # titles (metric name + statistical test info).
+    padding = 0.55
 
     if n_methods > 20:
-        padding += 0.30
+        padding += 0.35
     elif n_methods > 14:
-        padding += 0.25
+        padding += 0.30
     elif n_methods > 8:
-        padding += 0.20
+        padding += 0.25
     else:
-        padding += 0.15
+        padding += 0.20
 
     gap = label_drop + title_h + padding
-    return max(0.45, min(gap / max(per_row_h, 0.5), 1.80))
+    return max(0.55, min(gap / max(per_row_h, 0.5), 2.00))

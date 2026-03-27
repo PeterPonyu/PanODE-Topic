@@ -119,7 +119,7 @@ def _draw_sweep_boxplot(ax, df, param_col, metric):
                    alpha=0.80, zorder=5)
 
     title_text = _DISPLAY.get(metric, metric)
-    ax.set_title(title_text, fontsize=11, pad=6, loc="left",
+    ax.set_title(title_text, fontsize=10, pad=4, loc="left",
                  fontweight="normal")
     ax.set_xticks(np.arange(len(ordered)))
     ax.set_xticklabels([_format_sweep_label(v) for v in ordered],
@@ -136,8 +136,8 @@ def _draw_sweep_boxplot(ax, df, param_col, metric):
         bp["boxes"][best_i].set_linewidth(1.3)
 
     ymin, ymax = ax.get_ylim()
-    pad = abs(ymax - ymin) * 0.08
-    ax.set_ylim(ymin - pad * 0.3, ymax + pad)
+    pad = abs(ymax - ymin) * 0.05
+    ax.set_ylim(ymin - pad * 0.2, ymax + pad)
     from matplotlib.ticker import MaxNLocator
     ax.yaxis.set_major_locator(MaxNLocator(nbins='auto', prune='both'))
 
@@ -180,15 +180,15 @@ def generate(out_dir):
         return
 
     figw = 17.0
-    figh = 4.0 * n_rows + 1.5
+    figh = 3.2 * n_rows + 1.2
     fig = plt.figure(figsize=(figw, figh))
-    root = bind_figure_region(fig, (0.05, 0.03, 0.97, 0.96))
-    # gap is in figure-fraction; scale so x-tick labels have room
-    row_gap = min(0.04, 0.8 / max(n_rows, 1))
+    root = bind_figure_region(fig, (0.05, 0.03, 0.97, 0.97))
+    # gap is in figure-fraction; ensure enough room for titles/x-labels but minimal waste
+    row_gap = max(0.025, min(0.05, 1.2 / max(n_rows, 1)))
     row_regions = root.split_rows(n_rows, gap=row_gap)
 
     for r_idx, (sweep_name, sub_df, source) in enumerate(all_sweeps):
-        col_regions = row_regions[r_idx].split_cols(n_cols, gap=0.02)
+        col_regions = row_regions[r_idx].split_cols(n_cols, gap=0.015)
         for c_idx, metric in enumerate(core_metrics):
             ax = col_regions[c_idx].add_axes(fig)
             style_axes(ax, kind="boxplot")

@@ -66,7 +66,7 @@ VIS_STYLE: dict = {
     "lines.linewidth": 1.5,
     "savefig.dpi": 300,
     "savefig.bbox": None,
-    "savefig.pad_inches": 0.10,
+    "savefig.pad_inches": 0.04,
     "figure.constrained_layout.use": False,
     "figure.facecolor": "white",
 }
@@ -499,12 +499,13 @@ def save_with_vcd(
     with open(live_vcd_dir / f"{basename}.json", "w") as f:
         json.dump(live_vcd_payload, f, indent=2)
 
-    # 4) Save PDF with deterministic settings
-    fig.savefig(path.with_suffix(".pdf"), **save_kw)
+    # 4) Save using the requested suffix; default to PDF for suffix-less paths
+    target_path = path if path.suffix else path.with_suffix(".pdf")
+    fig.savefig(target_path, **save_kw)
 
     if close:
         plt.close(fig)
-    return path
+    return target_path
 
 
 # Backward-compatible alias
