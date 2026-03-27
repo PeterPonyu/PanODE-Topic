@@ -6,7 +6,7 @@
 
 set -u
 PYTHON=/home/zeyufu/miniconda3/envs/dl/bin/python
-cd /home/zeyufu/Desktop/PanODE-LAB
+cd /home/zeyufu/Desktop/PanODE-Topic
 LOGDIR=scripts/parallel_logs
 mkdir -p "$LOGDIR"
 

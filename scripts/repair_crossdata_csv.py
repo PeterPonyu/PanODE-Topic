@@ -39,7 +39,7 @@ RESULTS_DIR = DEFAULT_OUTPUT_DIR
 
 PRIOR_MODELS = {
     "DPMM-Base", "DPMM-Transformer", "DPMM-Contrastive",
-    "Topic-Base", "Topic-Transformer", "Topic-Contrastive",
+    "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive",
 }
 
 ALL_DATASETS = [

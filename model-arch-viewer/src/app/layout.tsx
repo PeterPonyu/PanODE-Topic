@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "PanODE Model Architecture Viewer",
-  description: "Interactive architecture diagrams for PanODE-LAB model variants",
+  description: "Interactive architecture diagrams for PanODE-Topic model variants",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

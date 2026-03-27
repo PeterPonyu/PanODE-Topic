@@ -8,7 +8,7 @@
 #   model-arch-viewer/public/statistical/
 #   → benchmarks/paper_figures/statistical/
 #
-# Run from the PanODE-LAB root directory.
+# Run from the PanODE-Topic root directory.
 
 set -euo pipefail
 

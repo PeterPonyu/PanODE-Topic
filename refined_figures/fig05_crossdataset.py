@@ -111,9 +111,10 @@ def generate(out_dir):
     n_rows = (n_pairs + n_cols - 1) // n_cols
 
     figw = 17.0
-    figh = 4.5 * n_rows + 1.5
+    figh = 4.5 * n_rows + 2.0
     fig = plt.figure(figsize=(figw, figh))
-    root = bind_figure_region(fig, (0.06, 0.06, 0.96, 0.94))
+    # Leave more bottom margin (0.10) for the legend below the plots
+    root = bind_figure_region(fig, (0.06, 0.10, 0.96, 0.94))
     grid = root.grid(n_rows, n_cols, wgap=0.04, hgap=0.06)
 
     for idx, (x_col, y_col) in enumerate(pairs):
@@ -124,20 +125,23 @@ def generate(out_dir):
         if idx == 0:
             add_panel_label(ax, "a")
 
-    # Shared legend
+    # Shared legend — placed in the dedicated bottom margin
     handles, labels = [], []
     for model in order:
         handles.append(plt.Line2D([0], [0], marker="o", ls="",
                                   color=get_color(model), markersize=5))
         labels.append(MODEL_SHORT_NAMES.get(model, model))
     fig.legend(handles, labels, loc="lower center",
-               bbox_to_anchor=(0.5, 0.005), ncol=min(len(order), 5),
+               bbox_to_anchor=(0.5, 0.02), ncol=min(len(order), 7),
                fontsize=9, frameon=False, handletextpad=0.3,
                columnspacing=0.6)
 
-    out_path = out_dir / "Fig5_crossdataset_topic.png"
-    save_with_vcd(fig, out_path, dpi=DPI, close=True)
-    print(f"  ✓ {out_path.name}")
+    out_path_png = out_dir / "Fig5_crossdataset_topic.png"
+    save_with_vcd(fig, out_path_png, dpi=DPI, close=False)
+    print(f"  ✓ {out_path_png.name}")
+    out_path_pdf = out_dir / "Fig5_crossdataset_topic.pdf"
+    save_with_vcd(fig, out_path_pdf, dpi=DPI, close=True)
+    print(f"  ✓ {out_path_pdf.name}")
 
 
 if __name__ == "__main__":

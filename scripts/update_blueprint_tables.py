@@ -43,7 +43,7 @@ DPMM_MODELS = [
     "Pure-AE", "Pure-Transformer-AE", "Pure-Contrastive-AE",
 ]
 TOPIC_MODELS = [
-    "Topic-Base", "Topic-Transformer", "Topic-Contrastive",
+    "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive",
     "Pure-VAE", "Pure-Transformer-VAE", "Pure-Contrastive-VAE",
 ]
 

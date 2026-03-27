@@ -7,7 +7,7 @@
 # Usage: bash scripts/run_full_benchmark_refresh.sh
 
 PYTHON=/home/zeyufu/miniconda3/envs/dl/bin/python
-PROJECT_ROOT=/home/zeyufu/Desktop/PanODE-LAB
+PROJECT_ROOT=/home/zeyufu/Desktop/PanODE-Topic
 cd "$PROJECT_ROOT"
 
 echo "============================================================"

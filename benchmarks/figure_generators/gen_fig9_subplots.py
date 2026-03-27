@@ -346,7 +346,7 @@ def generate(out_dir):
     beta_enrich_files = {}
     if series == "topic":
         # Only show the best-performing Topic variant's beta enrichment
-        _BEST_TOPIC_VARIANT = "Topic-Transformer"
+        _BEST_TOPIC_VARIANT = "Topic-FM-Transformer"
         beta_data = _load_beta_enrichments(models, results_dir)
         for ds_name, ds_models in beta_data.items():
             ds_beta = []

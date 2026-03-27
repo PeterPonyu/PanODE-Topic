@@ -1,16 +1,12 @@
 """
-Shared Modules for PanODE-LAB Models.
+Shared Modules for PanODE-Topic Models.
 
-This module contains reusable components shared across DPMM and Topic models:
+Reusable components shared across Topic-FM and Pure-VAE models:
 - Weight initialization
-- Common layers (MLP, Bottleneck, ODE functions)
-- Decoder architectures
+- Common layers (MLP, ResidualMLP, Bottleneck)
+- Decoder architectures (TopicDecoder, MLPDecoder)
 - Graph utilities (SubgraphDataset for efficient graph sampling)
-
-Design Philosophy:
-- DRY (Don't Repeat Yourself): Common code in one place
-- Single Responsibility: Each class has one clear purpose
-- Easy Testing: Modules can be tested independently
+- Reparameterization utilities
 """
 import math
 import numpy as np

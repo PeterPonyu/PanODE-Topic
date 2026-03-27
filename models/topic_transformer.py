@@ -247,13 +247,15 @@ class TopicODETransformerModel(PriorMixin, ReconstructionLossMixin, BaseModel):
                 recon_loss = recon_main
         else:
             raise ValueError(f"Unknown reconstruction_loss: {self.reconstruction_loss}")
-        
-        kl_loss = self._kl_logistic_normal(
+
+        # KL divergence with free bits (anti-collapse)
+        kl_loss = self._kl_logistic_normal_free_bits(
             outputs["mu"], outputs["var"],
-            self.prior_mu_topics, self.prior_sigma_topics ** 2)
-        
+            self.prior_mu_topics, self.prior_sigma_topics ** 2,
+            free_bits=0.1)
+
         total_loss = recon_loss + self.kl_weight * kl_loss
-        
+
         loss_dict = {"total_loss": total_loss, "recon_loss": recon_loss, "kl_loss": kl_loss}
         if "x_recon_bottleneck" in outputs:
             loss_dict["recon_bottleneck"] = recon_bottleneck

@@ -250,12 +250,13 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
         else:
             raise ValueError(f"Unknown reconstruction_loss: {self.reconstruction_loss}")
 
-        # KL divergence - regularization
-        kl_loss = self._kl_logistic_normal(
+        # KL divergence with free bits (anti-collapse, consistent with other Topic-FM models)
+        kl_loss = self._kl_logistic_normal_free_bits(
             outputs["mu"],
             outputs["var"],
             self.prior_mu_topics,
             self.prior_sigma_topics ** 2,
+            free_bits=0.1,
         )
 
         # MoCo InfoNCE loss: queue-based contrastive learning
@@ -292,20 +293,21 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
             topic_means = theta.mean(dim=0)
             topic_diversity_bonus = torch.sum(topic_means * torch.log(topic_means + 1e-10))
 
-        # Flow matching loss (activates after warmup)
+        # Flow matching loss (activates after warmup, with linear ramp)
         flow_loss = torch.tensor(0.0, device=outputs["x"].device)
-        if self._flow_active() and "log_theta" in outputs:
+        current_fw = self._current_flow_weight()
+        if current_fw > 0 and "log_theta" in outputs:
             flow_loss = self.compute_flow_loss(outputs["log_theta"])
 
         # Final loss: reconstruction-focused with contrastive losses + flow
         total_loss = (recon_loss +
                       current_kl_weight * kl_loss +
-                      0.1 * moco_loss +
+                      self.moco_weight * moco_loss +
                       0.05 * symmetric_loss +
                       0.05 * prototype_loss +
                       0.01 * topic_sparsity_loss +
                       0.01 * topic_diversity_bonus +
-                      self.flow_weight * flow_loss)
+                      current_fw * flow_loss)
 
         loss_dict = {
             "total_loss": total_loss,
@@ -361,8 +363,19 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
         self.device = torch.device(device)
         optimizer = torch.optim.AdamW(self.parameters(), lr=lr, weight_decay=weight_decay)
 
+        # LR schedule: linear warmup (10% of epochs) + cosine decay
+        warmup_epochs = max(1, epochs // 10)
+        def lr_lambda(epoch):
+            if epoch < warmup_epochs:
+                return (epoch + 1) / warmup_epochs
+            progress = (epoch - warmup_epochs) / max(1, epochs - warmup_epochs)
+            return 0.5 * (1.0 + np.cos(np.pi * progress))
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+
         # Use provided kl_weight or fall back to self.kl_weight
-        current_kl_weight = kl_weight if kl_weight is not None else self.kl_weight
+        target_kl_weight = kl_weight if kl_weight is not None else self.kl_weight
+        # KL annealing: ramp KL from 0 to target over warmup_epochs
+        kl_anneal_epochs = warmup_epochs
 
         best_loss = float('inf')
         patience_counter = 0
@@ -371,6 +384,7 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
         kl_losses = []
         moco_losses = []
         flow_losses = []
+        val_losses = []
 
         if verbose_every is None or verbose_every < 1:
             verbose_every = 1
@@ -378,6 +392,10 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
         for epoch in range(epochs):
             # Set current epoch for flow warmup tracking
             self._flow_current_epoch = epoch
+
+            # KL annealing: linearly ramp from 0 to target
+            kl_anneal = min(1.0, (epoch + 1) / max(1, kl_anneal_epochs))
+            current_kl_weight = target_kl_weight * kl_anneal
 
             self.train()
 
@@ -406,6 +424,9 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
                 torch.nn.utils.clip_grad_norm_(self.parameters(), 10.0)
                 optimizer.step()
 
+                # EMA update after each optimizer step
+                self._ema_update()
+
                 epoch_loss += loss.item()
                 epoch_recon += loss_dict["recon_loss"].item()
                 epoch_kl += loss_dict["kl_loss"].item()
@@ -414,6 +435,8 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
                 epoch_flow += loss_dict["flow_loss"].item()
 
                 n_batches += 1
+
+            scheduler.step()
 
             if n_batches == 0:
                 continue
@@ -430,6 +453,24 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
             moco_losses.append(avg_moco)
             flow_losses.append(avg_flow)
 
+            # Validation loss for early stopping when val_loader is available
+            es_loss = avg_loss
+            if val_loader is not None:
+                self.eval()
+                # Use EMA weights for validation if available
+                self._ema_swap()
+                val_loss_sum, val_n = 0.0, 0
+                with torch.no_grad():
+                    for vbatch in val_loader:
+                        vx, vkw = self._prepare_batch(vbatch, device)
+                        vout = self.forward(vx, **vkw)
+                        vloss = self.compute_loss(vout, kl_weight=current_kl_weight)
+                        val_loss_sum += vloss["total_loss"].item()
+                        val_n += 1
+                self._ema_restore()
+                es_loss = val_loss_sum / max(val_n, 1)
+                val_losses.append(es_loss)
+
             # Verbose logging with verbose_every
             do_print = (verbose >= 1) and (
                 ((epoch + 1) % verbose_every == 0) or (epoch == 0) or (epoch + 1 == epochs)
@@ -437,17 +478,19 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
 
             if do_print:
                 flow_status = "ON" if self._flow_active() else "OFF"
+                fw = self._current_flow_weight()
+                val_str = f" | Val: {es_loss:.4f}" if val_loader is not None else ""
                 print(
                     f"Epoch {epoch+1:3d}/{epochs} [TopicFMContrastive] | "
                     f"Loss: {avg_loss:.4f} | Recon: {avg_recon:.4f} | "
-                    f"KL: {avg_kl:.4f} (b={current_kl_weight:.2f}) | "
+                    f"KL: {avg_kl:.4f} (b={current_kl_weight:.3f}) | "
                     f"MoCo: {avg_moco:.4f} | "
-                    f"Flow: {avg_flow:.4f} [{flow_status}]"
+                    f"Flow: {avg_flow:.4f} (w={fw:.3f}) [{flow_status}]{val_str}"
                 )
 
-            # Early stopping
-            if avg_loss < best_loss:
-                best_loss = avg_loss
+            # Early stopping (on val loss if available, else train loss)
+            if es_loss < best_loss:
+                best_loss = es_loss
                 patience_counter = 0
                 if save_path:
                     torch.save(self.state_dict(), save_path)
@@ -460,13 +503,19 @@ class TopicFMContrastiveModel(TopicFlowMatchingMixin, PriorMixin, Reconstruction
                         print(f"Early stopping at epoch {epoch+1}")
                     break
 
-        return {
+        # After training, swap to EMA weights for inference
+        self._ema_swap()
+
+        result = {
             "train_loss": train_losses,
             "recon_loss": recon_losses,
             "kl_loss": kl_losses,
             "moco_loss": moco_losses,
             "flow_loss": flow_losses,
         }
+        if val_losses:
+            result["val_loss"] = val_losses
+        return result
 
     def extract_latent(
         self,

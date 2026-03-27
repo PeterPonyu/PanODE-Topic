@@ -1,14 +1,12 @@
 """
-LDAODEContrastive: Topic model with momentum contrastive learning and ODE.
+Topic Contrastive — VAE with MoCo contrastive learning.
 
 Core components:
 - Momentum Contrastive (MoCo) learning for topic representation
 - InfoNCE loss for self-supervised contrastive pre-training
 - Data augmentation strategies for single-cell count data
 
-Single-phase training:
-- Phase 1: Train VAE-based topic model + contrastive learning (fit method)
-
+Single-phase training with optional flow matching (in TopicFMContrastiveModel).
 """
 import torch
 import torch.nn as nn

@@ -1,10 +1,5 @@
 #!/usr/bin/env python
-"""
-Cross-Dataset Generalization Benchmark
-
-Evaluates all 12 model variants on multiple datasets spanning three
-data types: trajectory, cluster, and mixed. All model/training params
-are held at optimal defaults from single-dataset experiments.
+"""Cross-dataset generalization benchmark for Topic-FM and Pure-VAE models.
 
 Datasets:
   - setty.h5ad       (trajectory, 5780 cells, hematopoiesis)
@@ -38,7 +33,11 @@ import torch
 warnings.filterwarnings("ignore")
 
 from benchmarks.config import BASE_CONFIG, DEFAULT_OUTPUT_DIR, ensure_dirs, set_global_seed
-from benchmarks.dataset_registry import DATASET_REGISTRY, ALL_DATASET_REGISTRY
+from benchmarks.dataset_registry import (
+    ALL_DATASET_REGISTRY,
+    DATASET_REGISTRY,
+    standardize_label_column,
+)
 from benchmarks.model_registry import MODELS, SERIES_GROUPS
 from benchmarks.data_utils import load_or_preprocess_adata
 from benchmarks.train_utils import (
@@ -46,7 +45,7 @@ from benchmarks.train_utils import (
     select_models, apply_model_overrides)
 from utils.data import DataSplitter
 from utils.viz import plot_umap_grid, plot_all_metrics_barplot
-from utils.paper_style import MODEL_SHORT_NAMES, MODEL_ORDER_DPMM, MODEL_ORDER_TOPIC
+from utils.paper_style import MODEL_ORDER_TOPIC
 
 # ── defaults ──────────────────────────────────────────────────────────────────
 LATENT_DIM    = BASE_CONFIG.latent_dim
@@ -58,16 +57,6 @@ SEED          = BASE_CONFIG.seed
 VERBOSE_EVERY = BASE_CONFIG.verbose_every
 HVG_TOP       = BASE_CONFIG.hvg_top_genes
 MAX_CELLS     = BASE_CONFIG.max_cells
-
-def standardize_labels(adata, label_key):
-    """Copy dataset-specific label column to 'cell_type' for DataSplitter compatibility."""
-    if label_key in adata.obs.columns:
-        adata.obs["cell_type"] = adata.obs[label_key].copy()
-    elif "cell_type" not in adata.obs.columns:
-        print(f"  WARNING: Neither '{label_key}' nor 'cell_type' found in obs. "
-              "Will use KMeans pseudo-labels.")
-    return adata
-
 
 def train_one(model_name, model_info, splitter, data_type, device, verbose_every):
     """Train a single model variant via the shared train_and_evaluate loop."""
@@ -102,7 +91,10 @@ def run_dataset(ds_key, ds_info, device, verbose_every, seed, cache_dir, no_plot
         seed=seed, cache_dir=str(cache_dir), use_cache=True)
 
     # Standardize label column
-    adata = standardize_labels(adata, ds_info["label_key"])
+    adata, resolved_label_key = standardize_label_column(
+        adata, preferred=ds_info.get("label_key"))
+    if resolved_label_key is None:
+        print(f"  WARNING: No labels found for {ds_key}; using pseudo-label fallback.")
 
     splitter = DataSplitter(
         adata=adata, layer="counts",
@@ -163,7 +155,7 @@ def run_dataset(ds_key, ds_info, device, verbose_every, seed, cache_dir, no_plot
         "dataset": ds_key,
         "data_path": ds_info["path"],
         "data_type": ds_info["data_type"],
-        "label_key": ds_info["label_key"],
+        "label_key": resolved_label_key or ds_info["label_key"],
         "n_cells": n_cells, "n_genes": n_genes, "n_labels": n_labels,
         "epochs_per_model": {m: info["params"].get("fit_epochs", EPOCHS)
                              for m, info in selected_models.items()},
@@ -200,7 +192,7 @@ def run_dataset(ds_key, ds_info, device, verbose_every, seed, cache_dir, no_plot
         # Also produce per-series separated barplots with improved style
         try:
             from utils.viz import plot_core_metrics_barplot
-            for series_tag, order in [("dpmm", MODEL_ORDER_DPMM), ("topic", MODEL_ORDER_TOPIC)]:
+            for series_tag, order in [("topic", MODEL_ORDER_TOPIC)]:
                 s_models = [m for m in order if m in df["Model"].values]
                 if len(s_models) < 2:
                     continue
@@ -224,22 +216,19 @@ def main():
   # All models, all datasets
   python benchmarks/benchmark_crossdata.py
 
-  # Only DPMM series on setty
-  python benchmarks/benchmark_crossdata.py --series dpmm --datasets setty
+  # Only Topic-FM series on setty
+  python benchmarks/benchmark_crossdata.py --series topic --datasets setty
 
   # Only Pure baselines, override epochs to 500
   python benchmarks/benchmark_crossdata.py --series pure --override-epochs 500
 
   # Specific models
-  python benchmarks/benchmark_crossdata.py --models Pure-Transformer-VAE Topic-Transformer
-
-  # DPMM series with custom dropout
-  python benchmarks/benchmark_crossdata.py --series dpmm --override-dropout 0.15
+  python benchmarks/benchmark_crossdata.py --models Pure-Transformer-VAE Topic-FM-Transformer
 """)
     ap.add_argument("--datasets", nargs="+", default=None,
                     help="Which datasets to run (core + extra). Default: all core.")
     ap.add_argument("--series", type=str, default="all",
-                    help="Model series to run: all, dpmm, topic, pure, pure-ae, "
+                    help="Model series to run: all, topic, topic-fm, pure, "
                          "pure-vae, or comma-separated combination. Default: all.")
     ap.add_argument("--models", nargs="+", default=None,
                     help="Explicit model names to run (overrides --series).")

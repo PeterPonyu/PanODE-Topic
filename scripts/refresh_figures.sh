@@ -61,7 +61,7 @@ SERIES_LIST="${SERIES[*]}"
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════════════╗"
-echo "║           PanODE-LAB  Figure Refresh Pipeline                  ║"
+echo "║           PanODE-Topic  Figure Refresh Pipeline                  ║"
 echo "╠══════════════════════════════════════════════════════════════════╣"
 echo "║  Series : $SERIES_LIST"
 echo "║  Figures: $FIG_ARGS"

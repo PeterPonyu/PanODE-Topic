@@ -25,7 +25,7 @@ import fs from "fs";
 
 const PORT = 3099;
 const BASE = `http://localhost:${PORT}`;
-const OUT_BASE = "/home/zeyufu/Desktop/PanODE-LAB/benchmarks/paper_figures";
+const OUT_BASE = "/home/zeyufu/Desktop/PanODE-Topic/benchmarks/paper_figures";
 const DPR = 3;  // deviceScaleFactor for high-res output
 
 // Maximum output size at DPR=3 (17cm × 23cm at 288 DPI = 96×3)

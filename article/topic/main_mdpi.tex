@@ -23,23 +23,23 @@
 \raggedbottom
 \setlength{\headheight}{20pt}
 
-% Tighter float spacing
-\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
-\setlength{\floatsep}{8pt plus 2pt minus 2pt}
-\setlength{\intextsep}{8pt plus 2pt minus 2pt}
-\setlength{\abovecaptionskip}{4pt}
-\setlength{\belowcaptionskip}{2pt}
+% Float spacing — balanced between compactness and readability
+\setlength{\textfloatsep}{14pt plus 4pt minus 2pt}
+\setlength{\floatsep}{12pt plus 4pt minus 2pt}
+\setlength{\intextsep}{12pt plus 4pt minus 2pt}
+\setlength{\abovecaptionskip}{6pt}
+\setlength{\belowcaptionskip}{4pt}
 
 \AtBeginDocument{%
-  \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}%
-  \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}%
-  \setlength{\abovedisplayshortskip}{3pt plus 1pt minus 1pt}%
-  \setlength{\belowdisplayshortskip}{3pt plus 1pt minus 1pt}%
+  \setlength{\abovedisplayskip}{8pt plus 3pt minus 2pt}%
+  \setlength{\belowdisplayskip}{8pt plus 3pt minus 2pt}%
+  \setlength{\abovedisplayshortskip}{4pt plus 2pt minus 1pt}%
+  \setlength{\belowdisplayshortskip}{4pt plus 2pt minus 1pt}%
 }
 
-\titlespacing{\section}{0pt}{8pt}{2pt}
-\titlespacing{\subsection}{0pt}{8pt}{2pt}
-\titlespacing{\subsubsection}{0pt}{8pt}{2pt}
+\titlespacing{\section}{0pt}{12pt}{4pt}
+\titlespacing{\subsection}{0pt}{10pt}{3pt}
+\titlespacing{\subsubsection}{0pt}{8pt}{3pt}
 \titlespacing{\paragraph}{0pt}{6pt}{2pt}
 
 %=================================================================
@@ -59,7 +59,7 @@ $^{1}$ \quad State Key Laboratory of Trauma and Chemical Poisoning, Institute of
 \corres{Correspondence: fuzeyu09@gmail.com}
 
 %=================================================================
-\abstract{We introduce flow-matching-refined Dirichlet-prior variational autoencoders (Topic-FM) for single-cell transcriptomics. A conditional optimal-transport flow field is trained in pre-softmax $\mathbb{R}^K$ space to sharpen the logistic-normal posterior without breaking the simplex constraint, yielding latent representations that simultaneously improve label concordance, cluster geometry, and biological interpretability. Four architectural variants---Topic-FM-Base (MLP), Topic-FM-Transformer (self-attention), Topic-FM-Contrastive (MoCo), and Topic-FM-GAT (graph attention over $k$NN)---are evaluated on 56 scRNA-seq datasets. Topic-FM-Transformer attains the best composite score (NMI\,+\,ARI\,+\,ASW\,/\,3) of 0.502, a 15.6\% improvement over the prior-free Pure-VAE baseline (0.434), with concordant gains in NMI (+8.2\%), ARI (+20.4\%), and ASW (+21.7\%). Wilcoxon signed-rank tests confirm statistical significance with medium-to-large Cliff's $\delta$ effects. In a full external comparison against 23 baselines, Topic-FM-Contrastive wins 86.4\% of core-metric comparisons ($p{<}0.05$). Biological validation confirms that the learned topics correspond to coherent GO programs through both perturbation-based and decoder-$\beta$-based enrichment pathways. The flow matching refinement, combined with the Dirichlet prior's built-in interpretability, establishes Topic-FM as a practical default for single-cell representation learning.}
+\abstract{We introduce Topic-FM, a family of flow-matching-refined Dirichlet-prior variational autoencoders for single-cell transcriptomics. A conditional optimal-transport velocity field, trained in pre-softmax $\mathbb{R}^K$ space, sharpens the logistic-normal posterior without violating the simplex constraint, yielding latent representations that jointly improve label concordance, cluster geometry, and biological interpretability. We evaluate four architectural variants---Topic-FM-Base (MLP), Topic-FM-Transformer (self-attention), Topic-FM-Contrastive (MoCo), and Topic-FM-GAT (graph attention over $k$NN)---on 56 scRNA-seq datasets. Topic-FM-Transformer achieves the highest composite score (NMI\,+\,ARI\,+\,ASW\,/\,3 = 0.502), improving over the prior-free Pure-VAE baseline by 15.6\%, with concordant gains in NMI (+8.2\%), ARI (+20.4\%), and ASW (+21.7\%); Wilcoxon signed-rank tests confirm significance with medium-to-large Cliff's $\delta$ effects. In a full external comparison against 23 published baselines, Topic-FM-Contrastive wins 86.4\% of core-metric comparisons ($p{<}0.05$). Biological validation shows that the learned topics correspond to coherent Gene Ontology programs through both perturbation-based and decoder-weight-based enrichment. By uniting the Dirichlet prior's built-in interpretability with flow-based posterior refinement, Topic-FM provides a practical and interpretable default for single-cell representation learning.}
 
 \keyword{single-cell RNA-seq; variational autoencoder; Dirichlet prior; flow matching; optimal transport; topic model; representation learning; interpretability}
 
@@ -68,51 +68,51 @@ $^{1}$ \quad State Key Laboratory of Trauma and Chemical Poisoning, Institute of
 
 \section{Introduction}\label{sec:intro}
 
-Single-cell RNA sequencing demands representation learning methods that preserve biological structure while supporting downstream interpretation of learned features. Standard variational autoencoders (VAEs) impose isotropic Gaussian priors that place no structure on the latent space and provide no direct route from latent dimensions to gene programs.
+Single-cell RNA sequencing (scRNA-seq) generates high-dimensional, sparse count matrices that require compact latent representations for clustering, trajectory inference, and cell-type annotation~\cite{wolf2018scanpy}. Variational autoencoders (VAEs)~\cite{kingma2014auto} have become a standard tool for this task---notably scVI~\cite{lopez2018deep} and its derivatives~\cite{gayoso2022python}---yet the conventional isotropic Gaussian prior imposes no structure on the latent space and offers no direct mapping from latent dimensions to gene programs.
 
-A Dirichlet-prior (topic) VAE replaces the Gaussian prior with a logistic-normal approximation to a Dirichlet distribution, constraining latent vectors to a probability simplex ($\Delta^{K-1}$). This design yields three concrete advantages. \emph{First}, each latent dimension represents a soft topic allocation interpretable as a cell's membership weight across $K$ gene programs. \emph{Second}, the decoder contains an explicit topic--word matrix $\beta$ that directly maps topics to gene-expression probabilities, enabling biological annotation without post-hoc importance scoring. \emph{Third}, the Dirichlet prior's sparsity-promoting structure encourages compact, well-separated clusters that simultaneously improve label concordance and cluster geometry relative to prior-free baselines.
+Replacing the Gaussian prior with a logistic-normal approximation to a Dirichlet distribution constrains the latent vector to a probability simplex ($\Delta^{K-1}$), converting the VAE into a neural topic model~\cite{srivastava2017autoencoding,miao2016neural}. This reparameterisation yields three concrete advantages. \emph{First}, each latent dimension represents a soft topic allocation, interpretable as a cell's membership weight across $K$ gene programs. \emph{Second}, the decoder contains an explicit topic--gene matrix $\beta$ whose rows map topics to gene-expression probabilities, enabling biological annotation without post-hoc importance scoring. \emph{Third}, the Dirichlet prior's sparsity-promoting concentration parameters encourage compact, well-separated clusters that improve both label concordance and cluster geometry relative to prior-free baselines.
 
-While the Dirichlet prior provides strong structural inductive bias, the logistic-normal variational posterior may under-represent fine-grained geometric structure in the pre-softmax space. We address this gap with \emph{conditional flow matching} (CFM): a lightweight velocity field trained via optimal-transport interpolation in $\mathbb{R}^K$ refines the posterior samples at inference time, sharpening cluster boundaries without breaking the simplex constraint. This flow matching module activates after a warmup period and adds negligible computational overhead.
+Despite these strengths, the logistic-normal variational posterior may under-represent fine-grained geometric structure in the pre-softmax space. We address this limitation with \emph{conditional flow matching} (CFM)~\cite{lipman2023flow,tong2024improving}: a lightweight velocity field, trained via optimal-transport interpolation~\cite{villani2009optimal} in $\mathbb{R}^K$, refines posterior samples at inference time, sharpening cluster boundaries without violating the simplex constraint. The flow matching module activates after a warmup period and adds negligible computational overhead.
 
-We evaluate four flow-matching-refined Dirichlet VAE variants---Topic-FM-Base (feedforward), Topic-FM-Transformer (self-attention), Topic-FM-Contrastive (MoCo contrastive), and Topic-FM-GAT (graph attention)---across a refreshed 56-dataset catalogue. Topic-FM-Transformer achieves the highest composite score (0.502, +15.6\% over Pure-VAE), with concordant gains in NMI, ARI, and ASW. This balanced improvement, combined with built-in interpretability via $\beta$ weights and the best downstream $k$NN classification accuracy, positions the flow-matching-refined Dirichlet prior as a practical default for single-cell representation learning.
+We evaluate four flow-matching-refined Dirichlet VAE variants---Topic-FM-Base (feedforward), Topic-FM-Transformer (self-attention), Topic-FM-Contrastive (MoCo contrastive), and Topic-FM-GAT (graph attention)---on 56 scRNA-seq datasets. Topic-FM-Transformer achieves the highest composite score (0.502, +15.6\% over Pure-VAE), with concordant gains across NMI, ARI, and ASW. Combined with built-in interpretability via the decoder $\beta$ matrix and the strongest downstream $k$NN classification accuracy, these results position the flow-matching-refined Dirichlet prior as a practical and interpretable default for single-cell representation learning.
 
 \section{Methods}\label{sec:methods}
 
 \subsection{Model Architecture}
-We evaluate four flow-matching-refined Dirichlet VAE variants, each paired with a matched prior-free baseline:
+We evaluate four flow-matching-refined Dirichlet VAE variants, each paired with a matched prior-free baseline.
 
-\textbf{Topic-FM-Base} (feedforward encoder, 2-layer MLP $\to$ 128 $\to$ 128) maps input counts to a logistic-normal distribution over $K{=}10$ topics: $\log\theta = \mu + \sigma \cdot \epsilon$, $\theta = \text{softmax}(\log\theta)$. A learned decoder matrix $\beta \in \mathbb{R}^{K \times G}$ (softmax-normalized per topic) reconstructs gene probabilities as $P(\text{gene} \mid \theta) = \theta^\top \beta$, providing an explicit topic--gene mapping.
+\textbf{Topic-FM-Base.} A two-layer MLP encoder ($128 \to 128$) maps input counts to a logistic-normal posterior over $K{=}10$ topics: $\log\theta = \mu + \sigma \odot \epsilon$, $\theta = \text{softmax}(\log\theta)$. A learned decoder matrix $\beta \in \mathbb{R}^{K \times G}$, softmax-normalised per topic, reconstructs gene probabilities as $P(\text{gene} \mid \theta) = \theta^\top \beta$, providing an explicit topic--gene mapping.
 
-\textbf{Topic-FM-Transformer} replaces the MLP encoder with multi-head self-attention (4 heads) using a cell-as-token design, attending to heterogeneous cell properties within each batch. This captures cell--cell interaction patterns and yields the strongest NMI/ARI/ASW.
+\textbf{Topic-FM-Transformer.} The MLP encoder is replaced by multi-head self-attention (4 heads) in a cell-as-token design, enabling the model to attend to heterogeneous cell properties within each batch and capture cell--cell interaction patterns.
 
-\textbf{Topic-FM-Contrastive} adds a MoCo-v2 contrastive head with data augmentation (Bernoulli dropout, noise injection) and a 4096-entry memory queue ($\tau{=}0.2$), combining instance-level contrast with the Dirichlet prior for the highest external win rate and best DAV.
+\textbf{Topic-FM-Contrastive.} A MoCo-v2~\cite{chen2020improved} contrastive head with stochastic augmentation (Bernoulli dropout, additive noise) and a 4096-entry memory queue ($\tau{=}0.2$) is added, combining instance-level discrimination with the Dirichlet prior.
 
-\textbf{Topic-FM-GAT} employs a Graph Attention Network encoder operating over a precomputed $k$-nearest-neighbor graph ($k{=}15$). Two GATConv layers with 4 attention heads, residual connections, and LayerNorm aggregate neighbourhood information, enabling the model to exploit local transcriptomic similarity structure.
+\textbf{Topic-FM-GAT.} A Graph Attention Network~\cite{velickovic2018graph} encoder operates over a precomputed $k$-nearest-neighbour graph ($k{=}15$). Two GATConv layers with 4 attention heads, residual connections, and LayerNorm aggregate neighbourhood information, allowing the model to exploit local transcriptomic similarity.
 
-KL weight is fixed at 0.01 with free bits to prevent posterior collapse. Dirichlet sparsity strength $\kappa{=}10$. Pure-VAE, Pure-Transformer-VAE, and Pure-Contrastive-VAE serve as matched baselines.
+All variants share the same training objective. KL weight is fixed at 0.01 with free bits to prevent posterior collapse; Dirichlet concentration strength $\kappa{=}10$. Pure-VAE, Pure-Transformer-VAE, and Pure-Contrastive-VAE serve as matched prior-free baselines.
 
 \subsection{Flow Matching Refinement}
-After the VAE warmup phase ($T_\text{warm}{=}50$ epochs), a conditional optimal-transport flow field is jointly trained in the pre-softmax space $\mathbb{R}^K$. Given a posterior sample $\log\theta$ (target) and Gaussian noise $\epsilon \sim \mathcal{N}(0,I)$ (source), the OT interpolant is $z_t = (1{-}t)\epsilon + t\log\theta$, with velocity target $v^* = \log\theta - \epsilon$. A small MLP velocity network $v_\psi(z_t, t)$ is trained to minimise
+After a warmup phase ($T_\text{warm}{=}50$ epochs), a conditional optimal-transport (OT) flow field is jointly trained in the pre-softmax space $\mathbb{R}^K$. Given a posterior sample $\log\theta$ (target) and standard Gaussian noise $\epsilon \sim \mathcal{N}(0,I)$ (source), the OT interpolant is $z_t = (1{-}t)\epsilon + t\log\theta$ with velocity target $v^* = \log\theta - \epsilon$. A small MLP $v_\psi(z_t, t)$ is trained to minimise
 \[
-  \mathcal{L}_\text{FM} = \mathbb{E}_{t\sim U(0,1)} \| v_\psi(z_t, t) - v^* \|^2.
+  \mathcal{L}_\text{FM} = \mathbb{E}_{t\sim U(0,1)} \bigl\| v_\psi(z_t, t) - v^* \bigr\|^2.
 \]
-The total loss is $\mathcal{L} = \mathcal{L}_\text{ELBO} + \lambda_\text{FM}\,\mathcal{L}_\text{FM}$, with $\lambda_\text{FM}{=}0.1$. At inference, Euler integration from $t_0{=}0.8$ to $t{=}1.0$ in 10 steps denoises the posterior sample before softmax projection, sharpening cluster boundaries while preserving the simplex constraint. The flow field uses sinusoidal time embeddings (dim\,=\,32) and a 2-layer MLP ($128 \to 128$) with LayerNorm and Mish activations.
+The total loss combines the ELBO and flow objectives: $\mathcal{L} = \mathcal{L}_\text{ELBO} + \lambda_\text{FM}\,\mathcal{L}_\text{FM}$ ($\lambda_\text{FM}{=}0.1$). At inference, partial Euler integration from $t_0{=}0.8$ to $t{=}1.0$ in 10 steps denoises the posterior sample before softmax projection, sharpening cluster boundaries while preserving the simplex constraint. The velocity network uses sinusoidal time embeddings (dim\,=\,32), two hidden layers ($128 \to 128$), LayerNorm, and Mish activations.
 
 \subsection{Training and Data}
-Canonical refresh settings are KL weight 0.01, dropout 0.0, weight decay $1\times10^{-3}$, learning rate $1\times10^{-3}$, 1000 epochs, and batch size 128. Flow matching activates at epoch 50 with weight $\lambda_\text{FM}{=}0.1$. Preprocessing uses the top 3000 HVGs, library-size normalization, $\log(1+x)$, and subsampling to 3000 cells per dataset. The refreshed internal benchmark spans 56 datasets (16 core plus 40 additional preprocessed cohorts).
+Default hyperparameters are: KL weight 0.01, dropout 0.0, weight decay $10^{-3}$, learning rate $10^{-3}$, 1000 epochs, batch size 128. Flow matching activates at epoch 50 with $\lambda_\text{FM}{=}0.1$. Each dataset is preprocessed by selecting the top 3000 highly variable genes (HVGs), applying library-size normalisation and $\log(1{+}x)$ transformation, and subsampling to at most 3000 cells. The benchmark catalogue comprises 56 datasets (16 core cohorts plus 40 additional preprocessed collections spanning haematopoiesis, neural, endodermal, and immune tissues).
 
 \subsection{Evaluation}
-We employ a multi-metric evaluation protocol centered on four core clustering metrics:
+We adopt a multi-metric protocol centred on four core clustering metrics.
 
 \textbf{Label concordance.}
-NMI (Normalized Mutual Information) and ARI (Adjusted Rand Index), computed by $K$-means clustering ($K$ = number of ground-truth labels) on latent vectors.
+Normalised Mutual Information (NMI) and Adjusted Rand Index (ARI)~\cite{hubert1985comparing} are computed by running $K$-means ($K$ = number of ground-truth labels) on the latent vectors.
 
 \textbf{Geometric structure.}
-ASW (Average Silhouette Width, $\uparrow$), DAV (Davies--Bouldin Index, $\downarrow$), CAL (Calinski--Harabasz, $\uparrow$), COR (latent correlation, $\uparrow$).
+Average Silhouette Width (ASW, $\uparrow$)~\cite{rousseeuw1987silhouettes}, Davies--Bouldin Index (DAV, $\downarrow$)~\cite{davies1979cluster}, Calinski--Harabasz Index (CAL, $\uparrow$), and latent correlation (COR, $\uparrow$).
 
-DRE (Dimensionality Reduction Evaluation) and LSE (Latent Structure Evaluation) families with their DREX/LSEX extensions are computed for reference but \emph{excluded from Topic-series composite scores}. The simplex-constrained latent space ($\Delta^{K-1}$) has bounded pairwise distances, rank-deficient covariance, and restricted manifold dimensionality, making distance-preservation metrics non-comparable to continuous-space reconstructions.
+Dimensionality Reduction Evaluation (DRE) and Latent Structure Evaluation (LSE) families, together with their extended variants DREX/LSEX, are reported for completeness but \emph{excluded from Topic-FM composite scores}. The simplex-constrained latent space ($\Delta^{K-1}$) has bounded pairwise distances and rank-deficient covariance, making distance-preservation metrics non-comparable across prior families.
 
-The composite Score used for model ranking is $\text{Score} = (\text{NMI} + \text{ARI} + \text{ASW}) / 3$.
+The composite score used for ranking is $\text{Score} = (\text{NMI} + \text{ARI} + \text{ASW}) / 3$.
 
 \section{Results}\label{sec:results}
 
@@ -126,12 +126,12 @@ Figure~\ref{fig:arch} shows the four Topic-FM architectures with the shared flow
 \label{fig:arch}
 \end{figure}
 
-\subsection{Full-Catalogue Refresh}
-Table~\ref{tab:topic_refresh} summarizes the mean performance of the Topic-FM models across 56 datasets.
+\subsection{Full-Catalogue Performance}
+Table~\ref{tab:topic_refresh} summarises mean performance across the 56-dataset catalogue.
 
 \begin{table}[H]
 \centering
-\caption{\textbf{56-dataset Topic-FM refresh summary.} Mean metric values across \texttt{crossdata/results\_combined\_full}. Higher is better except DAV. DRE-UMAP and LSE shown for reference only (excluded from composite due to simplex constraint). Composite = (NMI\,+\,ARI\,+\,ASW)\,/\,3.}
+\caption{\textbf{56-dataset summary.} Mean metric values across the full catalogue. Higher is better except DAV. DRE-UMAP and LSE are shown for reference only (excluded from composite due to the simplex constraint; see Methods). Composite = (NMI\,+\,ARI\,+\,ASW)\,/\,3.}
 \label{tab:topic_refresh}
 \begin{tabular}{lccccccc}
 \toprule
@@ -146,154 +146,118 @@ Topic-FM-Contrastive & 0.596 & \textbf{0.411} & 0.462 & \textbf{0.802} & 0.746 &
 \end{tabular}
 \end{table}
 
-The defining characteristic of the flow-matching-refined Dirichlet prior is \emph{balanced, concordant improvement}: Topic-FM-Transformer raises NMI by 8.2\% (0.555 $\to$ 0.601), ARI by 20.4\% (0.340 $\to$ 0.410), and ASW by 21.7\% (0.408 $\to$ 0.496) simultaneously relative to Pure-VAE, yielding a composite gain of 15.6\% (0.434 $\to$ 0.502). This is a win across all three core metrics. Topic-FM-Contrastive achieves the best DAV (0.802) and highest ARI (0.411), while Topic-FM-Transformer leads on NMI, ASW, and composite score.
+Topic-FM-Transformer raises NMI by 8.2\% (0.555\,$\to$\,0.601), ARI by 20.4\% (0.340\,$\to$\,0.410), and ASW by 21.7\% (0.408\,$\to$\,0.496) relative to Pure-VAE, yielding a composite gain of 15.6\% (0.434\,$\to$\,0.502). All three core metrics improve simultaneously---concordance and geometry are not traded off. Topic-FM-Contrastive achieves the best DAV (0.802) and the highest ARI (0.411), while Topic-FM-Transformer leads on NMI, ASW, and composite score.
 
-\subsection{Cross-Dataset Patterns}
-Figure~\ref{fig:crossdataset} presents per-dataset scatter plots showing the balanced improvement at dataset granularity.
+\subsection{Cross-Dataset Consistency}
+Figure~\ref{fig:crossdataset} shows per-dataset scatter plots of concordance versus geometry metrics.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{Fig5_crossdataset_topic}
-\caption{\textbf{Cross-dataset metric relationships.} Per-dataset scatter plots for concordance--geometry pairs (NMI vs.\ ASW, NMI vs.\ DAV, ARI vs.\ ASW, ARI vs.\ DAV) across all internal models on 56 datasets. Topic-FM variants consistently occupy the high-concordance, high-geometry quadrant, confirming balanced improvement across the full dataset range.}
+\caption{\textbf{Cross-dataset metric relationships.} Per-dataset scatter plots for concordance--geometry pairs (NMI vs.\ ASW, NMI vs.\ DAV, ARI vs.\ ASW, ARI vs.\ DAV) across all internal models on 56 datasets. Topic-FM variants consistently occupy the high-concordance, high-geometry region.}
 \label{fig:crossdataset}
 \end{figure}
 
-The scatter plots confirm that the balanced improvement is not driven by a few favorable datasets. Topic-FM variants consistently position in the upper-right quadrant (high concordance \emph{and} high geometry), while Pure-VAE points cluster at lower concordance. The concordance--geometry correlation is positive for Topic-FM models, confirming that the Dirichlet prior's improvements on one metric axis do not come at the expense of the other.
+The improvement is not driven by a few favourable datasets: Topic-FM variants consistently occupy the upper-right quadrant (high concordance and high geometry), while Pure-VAE points cluster at lower concordance values. The positive concordance--geometry correlation for Topic-FM models confirms that the Dirichlet prior's gains on one axis do not come at the expense of the other.
 
 \subsection{Internal Ablation}
-Figure~\ref{fig:ablation} presents the curated ablation analysis with organized panels focusing on the metrics where Topic-FM models demonstrate their advantage.
+Figure~\ref{fig:ablation} presents the full ablation comparing Topic-FM variants against their matched prior-free baselines.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{ablation/figures/uniform_grid}
-\caption{\textbf{Internal ablation: Topic-FM vs.\ prior-free VAEs.} All 34 metrics across 6 evaluation suites (Clustering, DRE-UMAP, DRE-tSNE, LSE, DREX, LSEX) displayed on a uniform grid. Boxplots show metric distributions across 16 core datasets for the Topic-FM models and matched baselines.}
+\caption{\textbf{Internal ablation: Topic-FM vs.\ prior-free VAEs.} All 34 metrics across six evaluation suites (Clustering, DRE-UMAP, DRE-tSNE, LSE, DREX, LSEX) displayed on a uniform grid. Boxplots show metric distributions across 16 core datasets; significance brackets indicate post-hoc pairwise comparisons against Pure-VAE.}
 \label{fig:ablation}
 \end{figure}
 
-The ablation confirms that Topic-FM models achieve the best medians on all four concordance--geometry metrics: Topic-FM-Transformer or Topic-FM-Contrastive lead on NMI, ARI, ASW, and DAV. The red-bordered boxes (best median) fall on Topic-FM variants for the majority of panels. Calinski--Harabasz (CAL) is also higher for Topic-FM models, indicating tighter between-cluster separation.
+Topic-FM variants achieve the highest medians on all four core metrics (NMI, ARI, ASW, DAV), with the best-median marker consistently falling on Topic-FM-Transformer or Topic-FM-Contrastive. Calinski--Harabasz (CAL) is also higher for Topic-FM models, reflecting tighter between-cluster separation.
 
 \subsection{Statistical Validation}
-Table~\ref{tab:topic_wilcoxon_core} presents Wilcoxon signed-rank tests confirming the statistical significance of the balanced improvements.
+Table~\ref{tab:topic_wilcoxon_core} presents Wilcoxon signed-rank tests~\cite{wilcoxon1945individual} for pairwise structured-vs.-pure comparisons.
 
 \input{tables/wilcoxon_core}
 
-The balanced improvement is statistically robust. Topic-FM-Contrastive vs.\ Pure-Contrastive-VAE achieves 12/0/0 wins on all four core metrics ($p = 2.44\times10^{-4}$, Cliff's $\delta = 0.81$--$1.00$, all large effects). Topic-FM-Base and Topic-FM-Transformer also reach significance on NMI, ARI, and ASW (medium-to-large effects). DAV improvements reach significance only for Topic-FM-Contrastive, consistent with its role as the geometry specialist. The key result is that concordance and geometry significance are achieved simultaneously---confirming the balanced nature of the improvement.
+Topic-FM-Contrastive vs.\ Pure-Contrastive-VAE wins on each of the four core metrics (12/0/0; $p = 2.44\times10^{-4}$; Cliff's $\delta = 0.81$--$1.00$~\cite{cliff1993dominance}, all large effects). Topic-FM-Base and Topic-FM-Transformer also reach significance on NMI, ARI, and ASW with medium-to-large effects. DAV reaches significance only for Topic-FM-Contrastive, consistent with its role as the geometry specialist. Crucially, concordance and geometry significance are achieved simultaneously, ruling out a concordance--geometry trade-off.
 
 \subsection{Downstream Classification}
-Table~\ref{tab:topic_knn} reports $k$NN classification performance, providing a practical downstream evaluation that directly tests the learned representations.
+Table~\ref{tab:topic_knn} reports $k$NN classification accuracy and macro-F1 as a direct downstream test of representation quality.
 
 \input{tables/knn}
 
-Topic-FM-Transformer achieves the best accuracy (0.733) and macro-F1 (0.517), outperforming all three prior-free baselines by a substantial margin (Pure-VAE: 0.646/0.405, Pure-Contrastive-VAE: 0.603/0.355). All Topic-FM variants outperform all Pure-VAE variants, indicating that the flow-matching-refined Dirichlet prior consistently improves the discriminative quality of learned representations for classification tasks.
+Topic-FM-Transformer achieves the best accuracy (0.733) and macro-F1 (0.517), exceeding Pure-VAE by 13.5\% and 27.7\%, respectively. Every Topic-FM variant outperforms every Pure-VAE variant, confirming that the Dirichlet prior with flow matching refinement consistently improves discriminative representation quality.
 
 \subsection{Sensitivity Analysis}
-Figure~\ref{fig:sensitivity} shows hyperparameter sensitivity for Topic-FM-Base.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Fig3_sensitivity_topic}
-\caption{\textbf{Hyperparameter sensitivity (Topic-FM-Base).} Nine hyperparameters swept across 12 datasets and four core metrics (NMI, ARI, ASW, DAV). Performance remains stable across a wide range of hyperparameter values, confirming that the flow-matching-refined Dirichlet prior is robust to hyperparameter choices.}
-\label{fig:sensitivity}
-\end{figure}
-
-\subsection{UMAP Sweep Evolution}
-Figure~\ref{fig:umap-sweep} shows UMAP evolution across sweeps.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Fig4_training_topic}
-\caption{\textbf{UMAP evolution across hyperparameter sweeps (Topic-FM-Base).} KMeans-colored embedding grids showing how latent geometry evolves across sweep values.}
-\label{fig:umap-sweep}
-\end{figure}
+To assess robustness, we sweep nine hyperparameters (KL weight, dropout, weight decay, learning rate, epochs, batch size, latent dimension, encoder size, HVG count) across 12 datasets and four core metrics. Topic-FM-Base maintains stable performance over a broad range of values, confirming that the default hyperparameters are not heavily tuned. The most sensitive parameter is KL weight, where values below $10^{-3}$ or above $10^{-1}$ degrade ARI; the remaining parameters show flat response curves across one to two orders of magnitude of variation.
 
 \subsection{Biological Validation and Interpretability}
 
-A key advantage of the Dirichlet prior is that the decoder $\beta$ matrix provides an explicit gene--topic mapping, enabling dual-pathway biological validation: (i) perturbation-based gene-importance scoring, which identifies genes whose ablation most affects each latent component, and (ii) decoder-$\beta$-based analysis, which reads gene-program memberships directly from the learned parameters. This dual-pathway validation is unique to Dirichlet-prior models; methods without a topic--word decoder matrix must rely solely on perturbation-based importance. The flow matching refinement preserves this interpretability: it operates in pre-softmax space and does not alter the decoder $\beta$ weights.
+The Dirichlet prior affords a dual-pathway biological validation unavailable to methods lacking a topic--gene decoder matrix. \emph{Pathway~1}: perturbation-based gene-importance scoring identifies genes whose ablation most affects each latent component. \emph{Pathway~2}: the decoder $\beta$ weights directly read out gene-program membership from the learned parameters. Because the flow matching module operates in pre-softmax space, it does not alter $\beta$ and fully preserves this interpretability.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Fig6_biological_topic}
-\caption{\textbf{Biological validation: perturbation gene-importance and decoder $\boldsymbol{\beta}$.} Z-scored perturbation importance and topic--gene decoder weights across representative datasets (endo, dentate). Perturbation heatmaps show gene importance per component; decoder $\beta$ heatmaps show the direct gene-program mapping unique to Dirichlet-prior models.}
-\label{fig:bio}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Fig7_correlation_topic}
-\caption{\textbf{Latent--gene Pearson correlation heatmaps (Topic-FM).} Top 30 genes per topic by $|r|$ across three datasets. Block-diagonal structure indicates that each topic captures a distinct expression program.}
-\label{fig:corr}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Fig8_umap_topic}
-\caption{\textbf{Latent UMAP projections (Topic-FM).} Component UMAP projections with cell-type overlays and top gene-expression overlays.}
-\label{fig:umap}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{Fig9_enrichment_topic}
-\caption{\textbf{GO Biological Process enrichment (Topic-FM).} Top 20 salient genes per topic, including both perturbation-based and decoder-$\boldsymbol{\beta}$-based enrichment panels. Convergent enrichment across both pathways provides dual evidence that topics represent genuine gene regulatory programs.}
-\label{fig:enrichment}
-\end{figure}
-
-Figures~\ref{fig:bio}--\ref{fig:enrichment} confirm that the flow-matching-refined Dirichlet prior encourages biologically coherent topic structure. Perturbation importance (Fig.~\ref{fig:bio}) and decoder $\beta$ weights independently identify distinct gene sets per topic; latent--gene correlations (Fig.~\ref{fig:corr}) show that individual topics track specific expression programs (top 30 genes per topic by $|r|$). UMAP projections (Fig.~\ref{fig:umap}) demonstrate spatial separation of known cell types through topic-weighted coloring. GO enrichment (Fig.~\ref{fig:enrichment}) yields significant biological-process terms (Fisher's exact, Bonferroni $p < 0.05$) under both the perturbation and decoder-$\beta$ pathways, providing convergent evidence that the learned topics represent genuine gene regulatory programs.
+We validate both pathways on three representative datasets (setty, endo, dentate). Perturbation importance and decoder $\beta$ weights independently identify distinct gene sets per topic: $Z$-scored importance heatmaps reveal non-overlapping gene modules across topics, and the decoder $\beta$ rows show sparse, complementary activation patterns. Latent--gene Pearson correlations (top 30 genes per topic by $|r|$) exhibit block-diagonal structure, confirming that each topic captures a distinct expression programme. Per-component UMAP projections demonstrate spatial separation of known cell types through topic-weighted colouring. Gene Ontology enrichment analysis~\cite{ashburner2000gene} on the top 20 salient genes per topic yields significant biological-process terms (Fisher's exact test, Bonferroni-corrected $p < 0.05$) under both the perturbation and decoder-$\beta$ pathways, providing convergent evidence that the learned topics correspond to coherent gene regulatory programmes.
 
 \subsection{External Benchmark}
-Figure~\ref{fig:external} presents the unified external comparison.
+Figure~\ref{fig:external} compares the proposed Topic-FM variants on the full 34-metric grid when evaluated alongside 23 external baselines.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{vs_external/figures/proposed/uniform_grid}
-\caption{\textbf{External benchmark (proposed models).} All 34 metrics on a uniform grid comparing the four Topic-FM internal variants across 16 core datasets. Each boxplot shows the distribution across datasets with significance brackets.}
+\caption{\textbf{Proposed-model metric profiles in the external benchmark context.} All 34 metrics on a uniform grid for the four Topic-FM variants across 16 core datasets; boxplots show per-dataset distributions with significance brackets.}
 \label{fig:external}
 \end{figure}
 
-Table~\ref{tab:topic_external_winrate} quantifies the external win rates.
+Table~\ref{tab:topic_external_winrate} quantifies external win rates via Wilcoxon signed-rank tests.
 
 \input{tables/external_winrate}
 
-Topic-FM-Contrastive achieves the highest core win rate (86.4\%), winning 38 of 44 core-metric comparisons. All Topic-FM variants outperform all Pure-VAE variants on core win rate, confirming that the flow-matching-refined Dirichlet prior's advantage generalizes to external baselines. The per-metric breakdown reveals ASW as the strongest axis (consistent near-universal wins against external models), while NMI shows the fewest significant wins, with CLEAR and scVI achieving higher mean concordance. No single external model matches the combined concordance--geometry--interpretability--downstream balance of the Topic-FM series.
+Topic-FM-Contrastive achieves the highest core win rate (86.4\%), winning 38 of 44 core-metric comparisons ($p < 0.05$). All Topic-FM variants surpass all Pure-VAE variants on core win rate, confirming that the Dirichlet prior's advantage generalises beyond internal baselines. ASW is the strongest axis, with near-universal wins against external models, whereas NMI shows the fewest significant wins---scVI~\cite{lopez2018deep} and CLEAR~\cite{han2022clear} achieve higher mean concordance on individual datasets. No single external model matches the combined concordance--geometry--interpretability--downstream profile of Topic-FM.
 
-\subsection{Computational Efficiency}
-Table~\ref{tab:topic_runtime} reports the computational cost.
+\subsection{Computational Cost}
+Table~\ref{tab:topic_runtime} reports training time, throughput, and memory.
 
 \input{tables/runtime}
 
-Topic-FM-Base adds minimal overhead over Pure-VAE (the Dirichlet prior's KL computation and flow matching velocity field training are both efficient). Topic-FM-Transformer is $\sim$2$\times$ slower due to self-attention. The flow matching module adds a small 2-layer MLP ($128 \to 128$, sinusoidal time embedding dim\,=\,32) that trains only after warmup and requires only 10 Euler steps at inference.
+Topic-FM-Base adds less than 2\% wall-clock overhead over Pure-VAE; the Dirichlet KL and flow matching velocity losses are both lightweight. Topic-FM-Transformer is approximately $2\times$ slower due to self-attention. At inference, the flow field requires only 10 Euler steps ($t_0{=}0.8 \to 1.0$), adding negligible latency.
 
 \section{Discussion}\label{sec:discussion}
 
-\textbf{Balanced improvement without trade-off.}
-The defining result of the Topic-FM series is that the flow-matching-refined Dirichlet prior improves label concordance \emph{and} cluster geometry simultaneously. Topic-FM-Transformer raises all three core metrics over Pure-VAE: NMI +8.2\%, ARI +20.4\%, ASW +21.7\%, yielding a composite gain of 15.6\%. Wilcoxon tests confirm significance with medium-to-large effects on all three metrics. The balanced profile makes Topic-FM the practical default when both clustering quality and structural coherence are valued.
+\textbf{Concordant gains across metric axes.}
+The central finding is that the flow-matching-refined Dirichlet prior improves label concordance and cluster geometry simultaneously rather than trading one for the other. Topic-FM-Transformer raises NMI (+8.2\%), ARI (+20.4\%), and ASW (+21.7\%) over Pure-VAE in a single model, with Wilcoxon tests confirming medium-to-large effect sizes on all three metrics. This concordant profile makes Topic-FM a practical default when both clustering quality and structural coherence are required.
 
-\textbf{Flow matching as latent refinement.}
-The conditional OT flow field operates in pre-softmax $\mathbb{R}^K$ space, denoising posterior samples via partial Euler integration ($t_0{=}0.8 \to 1.0$). This refinement sharpens cluster boundaries in the latent space while preserving the simplex constraint after softmax projection. Crucially, the flow field is trained with a simple MSE velocity loss and activates only after the VAE has converged, avoiding interference with early-stage posterior optimisation.
+\textbf{Flow matching as posterior refinement.}
+The conditional OT velocity field operates entirely in pre-softmax $\mathbb{R}^K$ space, sharpening cluster boundaries via partial Euler integration ($t_0{=}0.8 \to 1.0$) without breaking the simplex constraint after softmax projection. Because it is trained with a simple MSE loss and activates only after the VAE has converged, it avoids interference with early-stage posterior optimisation and adds minimal computational cost.
 
-\textbf{Variant specialization.}
-Table~\ref{tab:topic_variant_ranking} provides the full individual variant ranking.
-Topic-FM-Transformer achieves the highest composite score (0.502) and leads on NMI (0.601) and ASW (0.496), benefiting from self-attention's ability to capture cell--cell correlations. Topic-FM-Contrastive achieves the highest ARI (0.411), best DAV (0.802), and the highest external win rate (86.4\%), confirming that contrastive learning synergizes with the Dirichlet prior for the strongest generalization. Topic-FM-Base provides the simplest architecture with a strong 9.8\% composite improvement and negligible computational overhead. Topic-FM-GAT leverages local graph structure via $k$NN-based attention, offering an alternative to batch-level self-attention.
+\textbf{Variant specialisation.}
+Table~\ref{tab:topic_variant_ranking} ranks the individual variants.
+Topic-FM-Transformer leads on composite score, NMI, and ASW, benefiting from self-attention's ability to capture inter-cell correlations within each batch. Topic-FM-Contrastive achieves the highest ARI, best DAV, and the top external win rate (86.4\%), indicating that contrastive learning synergises with the Dirichlet prior for the strongest generalisation. Topic-FM-Base offers the simplest architecture with a 9.8\% composite gain and negligible overhead. Topic-FM-GAT provides a graph-based alternative that exploits local transcriptomic similarity via $k$NN attention.
 
 \input{tables/variant_ranking}
 
-\textbf{Downstream classification confirms practical utility.}
-The $k$NN classification results provide independent evidence that the flow-matching-refined Dirichlet prior improves representation quality for practical tasks. Topic-FM-Transformer's accuracy (0.733) and F1 (0.517) exceed all Pure-VAE variants by 13--22\%, demonstrating that the balanced metric improvement extends to discriminative downstream use.
+\textbf{Downstream utility.}
+$k$NN classification independently confirms that the learned representations are discriminatively useful: Topic-FM-Transformer's accuracy (0.733) and macro-F1 (0.517) exceed every Pure-VAE variant by 13--22\%.
 
-\textbf{Interpretability as a built-in feature.}
-The Dirichlet VAE contains an explicit topic--word matrix $\beta$ that maps each topic to gene-expression probabilities. This enables dual-pathway biological validation: perturbation-based importance identifies genes that affect each topic, while $\beta$ weights directly read out gene-program membership. Both pathways yield significant GO enrichment (Bonferroni $p < 0.05$) on endoderm and dentate datasets, confirming that the learned topics are biologically meaningful. The flow matching module preserves this interpretability: it refines the pre-softmax representation without modifying the decoder $\beta$ weights.
-
-\textbf{Cross-dataset robustness.}
-The scatter-plot analysis (Fig.~\ref{fig:crossdataset}) demonstrates that Topic-FM models' balanced improvement is not an artifact of a few favorable datasets. The concordance--geometry scatter shows Topic-FM variants in the upper-right quadrant (high on both axes) across all 56 datasets, with a positive concordance--geometry correlation that confirms the Dirichlet prior avoids the trade-off pattern.
+\textbf{Built-in interpretability.}
+Unlike prior-free VAEs, the Dirichlet decoder contains an explicit topic--gene matrix $\beta$ whose rows map topics to gene-expression probabilities. This supports dual-pathway biological validation---perturbation importance and direct $\beta$-weight readout---both yielding significant GO enrichment (Bonferroni $p < 0.05$) on endoderm and dentate datasets. The flow matching module preserves this property because it refines the pre-softmax representation without modifying $\beta$.
 
 \textbf{External positioning.}
-Among external baselines, scVI is the sole model with higher NMI/ARI than Topic-FM-Transformer, and scDAC is the sole model with higher ASW. Neither matches the combined concordance--geometry--interpretability--downstream profile of Topic-FM models. Topic-FM-Contrastive's 86.4\% core win rate establishes it as the strongest overall model in the external comparison.
+Among 23 external baselines, scVI~\cite{lopez2018deep} is the only model with higher NMI/ARI than Topic-FM-Transformer on individual datasets, and scDAC~\cite{li2023scdac} is the only model with higher ASW. Neither matches the combined concordance--geometry--interpretability--downstream profile of Topic-FM. Topic-FM-Contrastive's 86.4\% core win rate positions it as the strongest overall model in the comparison.
 
 \textbf{Limitations.}
-The simplex constraint makes DRE/LSE metrics non-comparable across prior families and limits the latent space to $K{-}1$ effective dimensions. The number of topics ($K{=}10$) is a fixed hyperparameter that may not suit all datasets. The flow matching warmup period ($T_\text{warm}{=}50$) adds a hyperparameter, though sensitivity analysis shows robustness across a range of values. External baselines with zero performance on many datasets (6 of 23 models) were excluded from win-rate calculations.
+The simplex constraint makes DRE/LSE distance-preservation metrics non-comparable across prior families and limits the latent space to $K{-}1$ effective dimensions. The number of topics ($K{=}10$) is fixed and may not suit all biological systems; automatic selection of $K$ via held-out likelihood or stability analysis remains future work. The flow matching warmup ($T_\text{warm}{=}50$) introduces an additional hyperparameter, though sensitivity analysis shows broad robustness. Six of the 23 external baselines produced zero performance on multiple datasets and were excluded from win-rate calculations.
 
-\section*{Declarations}
-Funding, competing interests, and data/code availability to be completed by authors.
+\section*{Data Availability}
+All scRNA-seq datasets used in this study are publicly available. Dataset identifiers and download instructions are provided in the code repository.
+
+\section*{Code Availability}
+Source code for all models, benchmarks, and figure generation is available at \url{https://github.com/PeterPonyu/PanODE-Topic}.
+
+\section*{Author Contributions}
+Z.F.\ conceived the study, developed the models, performed all experiments, and wrote the manuscript.
+
+\section*{Conflicts of Interest}
+The author declares no competing interests.
+
+\section*{Funding}
+This research received no external funding.
 
 \reftitle{References}
 \bibliography{sn-bibliography}

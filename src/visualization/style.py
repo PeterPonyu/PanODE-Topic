@@ -9,7 +9,7 @@ Provides:
   - save_with_vcd(fig, path, dpi): canonical save with VCD
   - compute_fixed_export_bbox(): deterministic export crop
 
-Ported from CLOP-DiT geometry system, adapted for PanODE-DPMM/Topic.
+Adapted for PanODE-Topic (Topic-FM + Pure-VAE families).
 """
 
 from __future__ import annotations
@@ -72,40 +72,29 @@ VIS_STYLE: dict = {
 }
 
 # ──────────────────────────────────────────────────────────────
-# Model colour palette (12 models: cold→warm progression)
+# Model colour palette (Topic-FM + Pure-VAE: cold→warm)
 # ──────────────────────────────────────────────────────────────
 MODEL_COLORS = {
-    # Pure baselines (cold)
-    "Pure-AE":              "#4E79A7",
-    "Pure-Transformer-AE":  "#76B7B2",
-    "Pure-Contrastive-AE":  "#59A14F",
-    "Pure-VAE":             "#8CD17D",
-    "Pure-Transformer-VAE": "#EDC948",
-    "Pure-Contrastive-VAE": "#F28E2B",
-    # DPMM variants (warm)
-    "DPMM-Base":            "#E15759",
-    "DPMM-Transformer":     "#FF9D9A",
-    "DPMM-Contrastive":     "#B07AA1",
-    # Topic variants (warm)
-    "Topic-Base":           "#E15759",
-    "Topic-Transformer":    "#FF9D9A",
-    "Topic-Contrastive":    "#B07AA1",
+    # Pure-VAE baselines (cold)
+    "Pure-VAE":               "#8CD17D",
+    "Pure-Transformer-VAE":   "#EDC948",
+    "Pure-Contrastive-VAE":   "#F28E2B",
+    # Topic-FM variants (warm)
+    "Topic-FM-Base":          "#E15759",
+    "Topic-FM-Transformer":   "#FF9D9A",
+    "Topic-FM-Contrastive":   "#B07AA1",
+    "Topic-FM-GAT":           "#D4A6C8",
 }
 
 # Short display names for tight layouts
 MODEL_SHORT_NAMES = {
-    "Pure-AE": "P-AE",
-    "Pure-Transformer-AE": "P-T-AE",
-    "Pure-Contrastive-AE": "P-C-AE",
     "Pure-VAE": "P-VAE",
     "Pure-Transformer-VAE": "P-T-VAE",
     "Pure-Contrastive-VAE": "P-C-VAE",
-    "DPMM-Base": "DPMM",
-    "DPMM-Transformer": "DPMM-T",
-    "DPMM-Contrastive": "DPMM-C",
-    "Topic-Base": "Topic",
-    "Topic-Transformer": "Topic-T",
-    "Topic-Contrastive": "Topic-C",
+    "Topic-FM-Base": "TFM",
+    "Topic-FM-Transformer": "TFM-T",
+    "Topic-FM-Contrastive": "TFM-C",
+    "Topic-FM-GAT": "TFM-G",
 }
 
 # Semantic colours for annotations and UI elements

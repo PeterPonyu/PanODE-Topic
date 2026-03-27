@@ -31,8 +31,8 @@ BIO_RESULTS = BIO_RESULTS_DIR
 
 REPRESENTATIVE_DATASETS = ["setty", "endo", "dentate"]
 ALL_MODELS = [
-    "DPMM-Base", "DPMM-Contrastive", "DPMM-Transformer",
-    "Topic-Base", "Topic-Contrastive", "Topic-Transformer",
+    "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive",
+    "Pure-VAE", "Pure-Transformer-VAE", "Pure-Contrastive-VAE",
 ]
 
 
@@ -43,7 +43,7 @@ def compute_all(datasets=None, models=None, force=False):
         from benchmarks.biological_validation import load_data_with_genes
     except ImportError:
         print("  Cannot import load_data_with_genes. "
-              "Run from PanODE-LAB root.")
+              "Run from PanODE-Topic root.")
         return
 
     try:

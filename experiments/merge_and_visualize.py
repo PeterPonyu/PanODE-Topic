@@ -3,7 +3,7 @@
 Merge Internal + External Results and Visualise Comparison
 ==========================================================
 
-Combines the **12 internal PanODE-LAB models** (from ``full_comparison``)
+Combines the **7 internal PanODE-Topic models** (from ``full_comparison``)
 with all **external baselines** (from the external benchmark runner) into a
 single merged experiment, then generates publication-quality statistical
 comparison figures using the REA framework.
@@ -100,12 +100,10 @@ from experiments.visualize_experiment import (
 # Method ordering constants
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Internal models — same order as full_comparison preset
+# Internal models — same order as model_registry
 INTERNAL_METHODS = [
-    "Pure-AE", "Pure-Trans-AE", "Pure-Contr-AE",
-    "Pure-VAE", "Pure-Trans-VAE", "Pure-Contr-VAE",
-    "DPMM-Base", "DPMM-Trans", "DPMM-Contr",
-    "Topic-Base", "Topic-Trans", "Topic-Contr",
+    "Pure-VAE", "Pure-Transformer-VAE", "Pure-Contrastive-VAE",
+    "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive", "Topic-FM-GAT",
 ]
 
 # External baselines — ordered from eval_lib.baselines.registry
@@ -119,13 +117,13 @@ EXTERNAL_METHODS = list(EXTERNAL_MODELS.keys())
 # included in every group as the comparison anchor.
 #
 # Groups:
-#   1. internal  — all 12 proposed PanODE-LAB models
+#   1. internal  — all 7 proposed PanODE-Topic models
 #   2. external  — all external baselines + the focal model as reference
 #   3. topN      — top-K performers from both pools (cross-pool ranking)
 #
 METHOD_GROUP_THRESHOLD = 15   # auto-split when n_methods exceeds this
 
-FOCAL_METHOD = "Pure-Trans-AE"  # best-performing proposed model (anchor)
+FOCAL_METHOD = "Topic-FM-Base"  # best-performing proposed model (anchor)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Merged experiment configuration
@@ -187,7 +185,7 @@ def build_merged_config(
         ],
         output_root=output_root,
         description=(
-            f"Merged comparison: {len(internal_methods)} internal PanODE-LAB "
+            f"Merged comparison: {len(internal_methods)} internal PanODE-Topic "
             f"models + {len(external_methods)} external baselines"
         ))
 
@@ -534,7 +532,7 @@ def visualize_merged_grouped(
     When the merged experiment has too many methods (>METHOD_GROUP_THRESHOLD)
     for a single readable figure, this function splits them into:
 
-      1. **internal** — all 12 proposed PanODE-LAB models
+      1. **internal** — all 12 proposed PanODE-Topic models
       2. **external** — all external baselines + the focal model as reference
       3. **topN**     — cross-pool top performers ranked by *ranking_metric*
 

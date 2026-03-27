@@ -365,12 +365,13 @@ class TopicFMGATModel(TopicFlowMatchingMixin, PriorMixin, ReconstructionLossMixi
         if "x_recon_bottleneck" in outputs:
             loss_dict["recon_bottleneck"] = recon_bottleneck
 
-        # Flow matching loss (activates after warmup)
+        # Flow matching loss (activates after warmup, with linear ramp)
         flow_loss = torch.tensor(0.0, device=total_loss.device)
-        if self._flow_active() and "log_theta" in outputs:
+        current_fw = self._current_flow_weight()
+        if current_fw > 0 and "log_theta" in outputs:
             flow_loss = self.compute_flow_loss(outputs["log_theta"])
         loss_dict["flow_loss"] = flow_loss
-        loss_dict["total_loss"] = loss_dict["total_loss"] + self.flow_weight * flow_loss
+        loss_dict["total_loss"] = loss_dict["total_loss"] + current_fw * flow_loss
 
         return loss_dict
 
@@ -437,7 +438,19 @@ class TopicFMGATModel(TopicFlowMatchingMixin, PriorMixin, ReconstructionLossMixi
 
         # Step 3: Standard training loop (full-batch through GAT)
         optimizer = torch.optim.AdamW(self.parameters(), lr=lr, weight_decay=weight_decay)
-        current_kl_weight = kl_weight if kl_weight is not None else self.kl_weight
+
+        # LR schedule: linear warmup (10% of epochs) + cosine decay
+        warmup_epochs = max(1, epochs // 10)
+        def lr_lambda(epoch):
+            if epoch < warmup_epochs:
+                return (epoch + 1) / warmup_epochs
+            progress = (epoch - warmup_epochs) / max(1, epochs - warmup_epochs)
+            return 0.5 * (1.0 + np.cos(np.pi * progress))
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+
+        target_kl_weight = kl_weight if kl_weight is not None else self.kl_weight
+        # KL annealing: ramp KL from 0 to target over warmup_epochs
+        kl_anneal_epochs = warmup_epochs
 
         best_loss = float('inf')
         patience_counter = 0
@@ -452,6 +465,10 @@ class TopicFMGATModel(TopicFlowMatchingMixin, PriorMixin, ReconstructionLossMixi
         for epoch in range(epochs):
             # Set current epoch for flow warmup tracking
             self._flow_current_epoch = epoch
+
+            # KL annealing: linearly ramp from 0 to target
+            kl_anneal = min(1.0, (epoch + 1) / max(1, kl_anneal_epochs))
+            current_kl_weight = target_kl_weight * kl_anneal
 
             self.train()
             optimizer.zero_grad()
@@ -474,6 +491,10 @@ class TopicFMGATModel(TopicFlowMatchingMixin, PriorMixin, ReconstructionLossMixi
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.parameters(), 10.0)
             optimizer.step()
+            scheduler.step()
+
+            # EMA update after each optimizer step
+            self._ema_update()
 
             avg_loss = loss.item()
             avg_recon = loss_dict["recon_loss"].item()
@@ -492,11 +513,12 @@ class TopicFMGATModel(TopicFlowMatchingMixin, PriorMixin, ReconstructionLossMixi
 
             if do_print:
                 flow_status = "ON" if self._flow_active() else "OFF"
+                fw = self._current_flow_weight()
                 print(
                     f"Epoch {epoch+1:3d}/{epochs} [TopicFMGAT] | "
                     f"Loss: {avg_loss:.4f} | Recon: {avg_recon:.4f} | "
-                    f"KL: {avg_kl:.4f} (b={current_kl_weight:.2f}) | "
-                    f"Flow: {avg_flow:.4f} [{flow_status}]"
+                    f"KL: {avg_kl:.4f} (b={current_kl_weight:.3f}) | "
+                    f"Flow: {avg_flow:.4f} (w={fw:.3f}) [{flow_status}]"
                 )
 
             # Early stopping
@@ -513,6 +535,9 @@ class TopicFMGATModel(TopicFlowMatchingMixin, PriorMixin, ReconstructionLossMixi
                     if verbose >= 1:
                         print(f"Early stopping at epoch {epoch+1}")
                     break
+
+        # After training, swap to EMA weights for inference
+        self._ema_swap()
 
         return {
             "train_loss": train_losses,

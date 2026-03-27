@@ -7,8 +7,8 @@ its own sweep logic and ``main()``.
 
 Functions:
     train_and_evaluate   -- unified train → extract → metrics pipeline
-    make_topic_params    -- default Topic-Base model params
-    make_dpmm_params     -- default DPMM-Base model params
+    make_topic_params    -- default topic-model params
+    make_dpmm_params     -- legacy DPMM param helper
     print_convergence    -- pretty-print convergence diagnostics
     setup_series_dirs    -- create csv/plots/meta/latents dir trees
     save_latents         -- persist latent .npz files per-series
@@ -34,7 +34,7 @@ from benchmarks.metrics_utils import (
 
 def make_topic_params(latent_dim=None, kl_weight=0.01,
                       encoder_hidden=128, dropout=0.0):
-    """Return default Topic-Base architecture params.
+    """Return default topic-model architecture params.
 
     Used by benchmark_sensitivity, benchmark_training, and
     benchmark_preprocessing.
@@ -77,7 +77,7 @@ def make_dpmm_params(latent_dim=None, warmup_ratio=0.9,
 
 def train_and_evaluate(
     name, model_cls, params, splitter, device,
-    lr=1e-3, epochs=600, weight_decay=1e-5,
+    lr=1e-3, epochs=None, weight_decay=1e-5,
     verbose_every=50, data_type="trajectory",
     extra_fields=None, patience=None, dre_k=15):
     """Train a single model variant, compute metrics, return result dict.
@@ -126,7 +126,10 @@ def train_and_evaluate(
         # Pop fit-specific keys that model.__init__ doesn't accept
         fit_lr = params.pop("fit_lr", lr)
         fit_wd = params.pop("fit_weight_decay", weight_decay)
-        fit_epochs = params.pop("fit_epochs", epochs)
+        param_fit_epochs = params.pop("fit_epochs", None)
+        fit_epochs = epochs if epochs is not None else param_fit_epochs
+        if fit_epochs is None:
+            fit_epochs = BASE_CONFIG.epochs
 
         model = model_cls(input_dim=splitter.n_var, **params)
         model = model.to(device)
@@ -217,7 +220,7 @@ def train_and_evaluate(
             "Error": str(exc)[:200],
             "latent": None,
             "NMI": 0, "ARI": 0,
-            "Epochs": epochs,
+            "Epochs": fit_epochs if epochs is None else epochs,
             "EpochsTrained": 0,
         }
         if extra_fields:
@@ -347,7 +350,7 @@ def select_models(args, models_dict=None):
     if getattr(args, "models", None):
         names = [n.strip() if isinstance(n, str) else n for n in args.models]
         ordered = [n for n in names if n in models_dict]
-        selected = {k: models_dict[k] for k in ordered}
+        selected = {k: _clone_model_info(models_dict[k]) for k in ordered}
         missing = set(names) - set(selected)
         if missing:
             print(f"  WARNING: unknown model names ignored: {missing}")
@@ -355,7 +358,7 @@ def select_models(args, models_dict=None):
 
     series = getattr(args, "series", "all")
     if series == "all":
-        return dict(models_dict)
+        return {k: _clone_model_info(v) for k, v in models_dict.items()}
 
     allowed = []
     for s in series.split(","):
@@ -368,7 +371,14 @@ def select_models(args, models_dict=None):
             for k, v in models_dict.items():
                 if v.get("series") == s and k not in allowed:
                     allowed.append(k)
-    return {k: models_dict[k] for k in allowed if k in models_dict}
+    return {k: _clone_model_info(models_dict[k]) for k in allowed if k in models_dict}
+
+
+def _clone_model_info(model_info):
+    """Return a shallow copy with an isolated params dict."""
+    cloned = dict(model_info)
+    cloned["params"] = dict(model_info.get("params", {}))
+    return cloned
 
 
 def apply_model_overrides(selected_models, args):

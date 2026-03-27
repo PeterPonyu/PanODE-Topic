@@ -44,9 +44,9 @@ INTERNAL_PAIRS = {
         ("DPMM-Contrastive", "Pure-Contrastive-AE"),
     ],
     "topic": [
-        ("Topic-Base", "Pure-VAE"),
-        ("Topic-Transformer", "Pure-Transformer-VAE"),
-        ("Topic-Contrastive", "Pure-Contrastive-VAE"),
+        ("Topic-FM-Base", "Pure-VAE"),
+        ("Topic-FM-Transformer", "Pure-Transformer-VAE"),
+        ("Topic-FM-Contrastive", "Pure-Contrastive-VAE"),
     ],
 }
 

@@ -14,7 +14,7 @@ DPMM_MODELS = [
 ]
 TOPIC_MODELS = [
     "Pure-VAE", "Pure-Transformer-VAE", "Pure-Contrastive-VAE",
-    "Topic-Base", "Topic-Transformer", "Topic-Contrastive",
+    "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive",
 ]
 
 SERIES_CONFIG = {

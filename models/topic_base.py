@@ -1,9 +1,9 @@
 """
-Topic Model with ODE Continuous Modeling
+Topic Model — VAE with logistic-normal prior.
 
-Single-phase training:
-- Phase 1: Train VAE-based topic model (fit method)
-
+Provides the base TopicAutoEncoder (encoder + decoder) and TopicODEModel
+used as the foundation for the Topic-FM family. Single-phase training
+with optional flow matching (in the FM variants).
 """
 import torch
 import torch.nn as nn

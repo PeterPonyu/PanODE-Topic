@@ -94,23 +94,23 @@ def needs_method_split(
 def per_row_height(n_methods: int) -> float:
     """Row height (inches) keyed on method count.
 
-    Compressed relative to earlier versions to produce landscape-biased
-    per-group figures (H/W typically in 0.25 – 0.45).
+    Increased to provide adequate room for significance brackets,
+    subplot titles, and rotated x-tick labels without overlap.
     """
     if n_methods <= 3:
-        return 2.4
-    elif n_methods <= 6:
         return 2.8
+    elif n_methods <= 6:
+        return 3.4
     elif n_methods <= 8:
-        return 3.2
-    elif n_methods <= 10:
-        return 3.5
-    elif n_methods <= 14:
         return 3.8
+    elif n_methods <= 10:
+        return 4.2
+    elif n_methods <= 14:
+        return 4.5
     elif n_methods <= 20:
-        return 4.8
+        return 5.2
     else:
-        return 5.5
+        return 6.0
 
 
 def adaptive_params(n_methods: int, *, per_group: bool = False) -> tuple[float, float, float]:
@@ -123,24 +123,24 @@ def adaptive_params(n_methods: int, *, per_group: bool = False) -> tuple[float, 
     """
     if n_methods <= 3:
         # Small comparisons → generous height and large fonts.
-        h, r, fs = 2.4, 25, 11
+        h, r, fs = 2.8, 30, 11
     elif n_methods <= 6:
-        # Moderate method counts: keep x-ticks close to y-ticks (≈10 pt).
-        h, r, fs = 2.8, 35, 10 if per_group else 9
+        # Moderate method counts: steeper rotation for long method names.
+        h, r, fs = 3.4, 45, 10 if per_group else 9
     elif n_methods <= 8:
         # Up to 8 methods per panel is still comfortable at 9 pt.
-        h, r, fs = 3.2, 40, 9 if per_group else 8
+        h, r, fs = 3.8, 45, 9 if per_group else 8
     elif n_methods <= 10:
         # 9–10 methods: slight increase in height and rotation; keep 9 pt.
-        h, r, fs = 3.5, 45, 9 if per_group else 8
+        h, r, fs = 4.2, 50, 9 if per_group else 8
     elif n_methods <= 14:
-        h, r, fs = 3.8, 50, 9 if per_group else 7
+        h, r, fs = 4.5, 55, 9 if per_group else 7
     elif n_methods <= 20:
-        h, r, fs = 4.8, 60, 9 if per_group else 7
+        h, r, fs = 5.2, 60, 9 if per_group else 7
     else:
         # Very large unified grids (rare in the new workflow) fall back to
         # the global minimum; per-group mode should have split them already.
-        h, r, fs = 5.5, 70, 8 if per_group else 7
+        h, r, fs = 6.0, 70, 8 if per_group else 7
 
     return h, r, clamp_xtick_fontsize(fs, per_group=per_group)
 
@@ -210,7 +210,11 @@ def compute_hspace(
     xtick_fontsize: float,
     title_fontsize: float,
     per_row_h: float) -> float:
-    """Dynamic vertical spacing between subplot rows."""
+    """Dynamic vertical spacing between subplot rows.
+
+    Accounts for rotated x-tick labels, subplot titles, significance
+    brackets, and statistical annotations that sit above each panel.
+    """
     n_methods = len(method_names)
     max_label_len = max((len(m) for m in method_names), default=5)
     theta = math.radians(rotation_deg)
@@ -220,14 +224,18 @@ def compute_hspace(
     label_drop = (math.sin(theta) * max_label_len * char_w_in
                   + math.cos(theta) * char_h_in)
     title_h = title_fontsize * 1.4 / 72.0
-    padding = 0.08
+    # Base padding accounts for significance brackets above the plot
+    # and prevents x-tick labels from one row touching titles below.
+    padding = 0.35
 
     if n_methods > 20:
-        padding += 0.25
+        padding += 0.30
     elif n_methods > 14:
-        padding += 0.15
+        padding += 0.25
     elif n_methods > 8:
-        padding += 0.05
+        padding += 0.20
+    else:
+        padding += 0.15
 
     gap = label_drop + title_h + padding
-    return max(0.15, min(gap / max(per_row_h, 0.5), 1.40))
+    return max(0.45, min(gap / max(per_row_h, 0.5), 1.80))

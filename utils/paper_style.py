@@ -73,14 +73,15 @@ MODEL_ORDER_DPMM = [
     "DPMM-Contrastive",
 ]
 
-# Topic paper: Pure-VAE baselines first, then Topic variants
+# Topic paper: Pure-VAE baselines first, then Topic-FM variants
 MODEL_ORDER_TOPIC = [
     "Pure-VAE",
     "Pure-Transformer-VAE",
     "Pure-Contrastive-VAE",
-    "Topic-Base",
-    "Topic-Transformer",
-    "Topic-Contrastive",
+    "Topic-FM-Base",
+    "Topic-FM-Transformer",
+    "Topic-FM-Contrastive",
+    "Topic-FM-GAT",
 ]
 
 # Full 12-model order for cross-paper comparison
@@ -88,7 +89,13 @@ MODEL_ORDER_ALL = MODEL_ORDER_DPMM + MODEL_ORDER_TOPIC
 
 
 def get_model_order(series=None) -> List[str]:
-    """Return canonical model ordering (always Topic series)."""
+    """Return canonical model ordering for a figure series."""
+    if series == "dpmm":
+        return list(MODEL_ORDER_DPMM)
+    if series in (None, "topic", "topic-fm", "pure", "pure-vae"):
+        return list(MODEL_ORDER_TOPIC)
+    if series == "all":
+        return list(MODEL_ORDER_ALL)
     return list(MODEL_ORDER_TOPIC)
 
 
@@ -99,7 +106,7 @@ def get_model_order(series=None) -> List[str]:
 # Blue tones for Pure-AE family (cool, baseline)
 # Orange/red tones for DPMM family (warm, method)
 # Green tones for Pure-VAE family (cool, baseline)
-# Purple tones for Topic family (warm, method)
+# Plum tones for Topic-FM family (method)
 
 MODEL_COLORS: Dict[str, str] = {
     # ─── AE family (blue gradient) ───
@@ -115,9 +122,10 @@ MODEL_COLORS: Dict[str, str] = {
     "Pure-Transformer-VAE": "#31A354",   # medium green
     "Pure-Contrastive-VAE": "#006D2C",   # dark green
     # ─── Topic family (purple gradient) ───
-    "Topic-Base":           "#9E9AC8",   # light purple
-    "Topic-Transformer":    "#756BB1",   # medium purple
-    "Topic-Contrastive":    "#54278F",   # dark purple
+    "Topic-FM-Base":        "#B07AA1",   # muted plum
+    "Topic-FM-Transformer": "#8C5A84",   # medium plum
+    "Topic-FM-Contrastive": "#633D66",   # dark plum
+    "Topic-FM-GAT":         "#A05195",   # graph variant accent
 }
 
 # Short display names for tight layouts
@@ -131,9 +139,10 @@ MODEL_SHORT_NAMES: Dict[str, str] = {
     "Pure-VAE":             "P-VAE",
     "Pure-Transformer-VAE": "P-Tfm-VAE",
     "Pure-Contrastive-VAE": "P-Ctr-VAE",
-    "Topic-Base":           "Topic",
-    "Topic-Transformer":    "Topic-Tfm",
-    "Topic-Contrastive":    "Topic-Ctr",
+    "Topic-FM-Base":        "TFM-B",
+    "Topic-FM-Transformer": "TFM-T",
+    "Topic-FM-Contrastive": "TFM-C",
+    "Topic-FM-GAT":         "TFM-G",
 }
 
 

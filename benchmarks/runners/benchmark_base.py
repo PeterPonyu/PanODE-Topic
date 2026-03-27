@@ -1,22 +1,17 @@
 #!/usr/bin/env python
-"""
-Consolidated Benchmark — All Model Variants (No ODE)
+"""Consolidated benchmark for the active Topic-FM suite.
 
-Models (12 variants across 2 architecture families):
-  Pure baselines (no clustering prior, no strategy):
-    - Pure-AE / Pure-VAE
-  Standalone strategy ablations (no clustering prior):
-    - Pure-Transformer-AE / Pure-Contrastive-AE
-    - Pure-Transformer-VAE / Pure-Contrastive-VAE
-  DPMM series (AE backbone + DPMM clustering):
-    - DPMM-Base / DPMM-Transformer / DPMM-Contrastive
-  Topic / LDA series (VAE backbone + Dirichlet prior):
-    - Topic-Base / Topic-Transformer / Topic-Contrastive
+Models:
+  Pure-VAE baselines:
+    - Pure-VAE / Pure-Transformer-VAE / Pure-Contrastive-VAE
+  Topic-FM series:
+    - Topic-FM-Base / Topic-FM-Transformer / Topic-FM-Contrastive
+    - Topic-FM-GAT (when torch-geometric is available)
 
 Usage:
   python benchmarks/benchmark_base.py --epochs 200 --no-early-stopping
-  python benchmarks/benchmark_base.py --series dpmm --override-epochs 400
-  python benchmarks/benchmark_base.py --models Pure-AE DPMM-Base
+  python benchmarks/benchmark_base.py --series topic --override-epochs 400
+  python benchmarks/benchmark_base.py --models Pure-VAE Topic-FM-Transformer
 """
 
 import sys
@@ -44,7 +39,7 @@ warnings.filterwarnings('ignore')
 # ── Imports from extracted modules ────────────────────────────────────────────
 from benchmarks.config import (
     BASE_CONFIG, DEFAULT_OUTPUT_DIR, ensure_dirs, set_global_seed)
-from benchmarks.dataset_registry import DATASET_REGISTRY
+from benchmarks.dataset_registry import get_dataset_info, standardize_label_column
 from benchmarks.model_registry import (
     MODELS, SERIES_GROUPS, ABLATION_STEPS, is_cuda_oom, paper_group)
 from benchmarks.metrics_utils import convergence_diagnostics
@@ -127,7 +122,7 @@ def _train_model(name, cfg, splitter, device, lr, epochs, patience):
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Benchmark base models (no ODE)",
+        description="Benchmark Topic-FM models and matched Pure-VAE baselines",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     # Data
@@ -430,7 +425,7 @@ def main():
 
     es_str = f"Patience={PATIENCE}" if PATIENCE is not None else "Disabled"
     print("=" * 60)
-    print("CONSOLIDATED BENCHMARK (No ODE)")
+    print("CONSOLIDATED TOPIC-FM BENCHMARK")
     print("=" * 60)
     print(f"Device: {DEVICE}")
     print(f"Data: {DATA_PATH}")
@@ -448,10 +443,10 @@ def main():
         seed=SEED, cache_dir=DEFAULT_CACHE_DIR,
         use_cache=not args.no_cache)
 
-    # Standardize label column → 'cell_type' for DataSplitter compatibility
-    label_key = 'clusters' if 'clusters' in adata.obs.columns else 'cell_type'
-    if label_key in adata.obs.columns:
-        adata.obs["cell_type"] = adata.obs[label_key].copy()
+    ds_info = get_dataset_info(data_path=DATA_PATH)
+    preferred_label_key = ds_info["label_key"] if ds_info else None
+    adata, label_key = standardize_label_column(adata, preferred=preferred_label_key)
+    if label_key is not None:
         print(f"  Labels: {len(np.unique(adata.obs['cell_type'].values))} "
               f"types (from '{label_key}' → 'cell_type')")
     else:

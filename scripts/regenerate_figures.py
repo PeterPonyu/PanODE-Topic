@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 """
-Series-aware figure regenerator for PanODE-LAB.
+Series-aware figure regenerator for PanODE-Topic.
 
 Generates publication-quality **per-group** figures (one wide, single-row
 PDF per metric group) for every experiment, and organises results into
-two clearly separated article series:
+the Topic-FM article series:
 
-    DPMM series  ─  dpmm/ablation + dpmm/vs_external
     Topic series ─  topic/ablation + topic/vs_external
 
 Also regenerates per-group figures for the mixed full_comparison and
@@ -426,7 +425,7 @@ def generate_uniform_grid_figure(
     ncols = UNIFORM_NCOLS
     nrows = math.ceil(len(all_metrics) / ncols)
     fig_w = FIG_WIDTH_PER_METRIC * ncols
-    fig_h = row_h * nrows + 0.5
+    fig_h = row_h * nrows + 3.0
 
     hspace = _compute_hspace(method_names, rot, xtick_fs,
                              title_fontsize, row_h)
@@ -489,14 +488,14 @@ DPMM_ABLATION_METHODS = [
 ]
 
 TOPIC_ABLATION_METHODS = [
-    "Pure-VAE", "Topic-Base", "Topic-Transformer", "Topic-Contrastive",
+    "Pure-VAE", "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive",
 ]
 
 FULL_COMPARISON_METHODS = [
     "Pure-AE", "Pure-Trans-AE", "Pure-Contr-AE",
     "Pure-VAE", "Pure-Trans-VAE", "Pure-Contr-VAE",
     "DPMM-Base", "DPMM-Trans", "DPMM-Contr",
-    "Topic-Base", "Topic-Trans", "Topic-Contr",
+    "Topic-FM-Base", "Topic-FM-Trans", "Topic-FM-Contr",
 ]
 
 EXTERNAL_METHODS = [
@@ -508,7 +507,7 @@ EXTERNAL_METHODS = [
 ]
 
 DPMM_FOCAL = "DPMM-Contrastive"
-TOPIC_FOCAL = "Topic-Contrastive"
+TOPIC_FOCAL = "Topic-FM-Contrastive"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -656,7 +655,7 @@ def process_series(series_name: str, dpi: int = 300, save_png: bool = True):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Regenerate per-group publication figures for PanODE-LAB",
+        description="Regenerate per-group publication figures for PanODE-Topic",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

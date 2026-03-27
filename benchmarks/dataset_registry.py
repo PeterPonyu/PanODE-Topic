@@ -465,6 +465,16 @@ DATASET_GROUPS = {
 }
 
 
+LABEL_KEY_FALLBACKS = (
+    "cell_type",
+    "celltype",
+    "Cell type",
+    "clusters",
+    "Clusters",
+    "Main_cell_type",
+)
+
+
 def resolve_datasets(dataset_keys=None, registry=None):
     """Resolve dataset selection list. Returns ordered keys."""
     if registry is None:
@@ -481,3 +491,51 @@ def resolve_datasets(dataset_keys=None, registry=None):
         else:
             print(f"  WARNING: unknown dataset key/group '{k}' — skipping")
     return list(dict.fromkeys(expanded))  # deduplicate preserving order
+
+
+def get_dataset_info(dataset_key=None, data_path=None, registry=None):
+    """Return dataset metadata by key or absolute path."""
+    if registry is None:
+        registry = ALL_DATASET_REGISTRY
+    if dataset_key:
+        return registry.get(dataset_key)
+    if data_path is None:
+        return None
+    path_str = str(Path(data_path).resolve())
+    for info in registry.values():
+        if str(Path(info["path"]).resolve()) == path_str:
+            return info
+    return None
+
+
+def resolve_label_key(adata, preferred=None):
+    """Return the first available label column, preferring dataset metadata."""
+    obs = adata.obs
+    columns = set(obs.columns) if hasattr(obs, "columns") else set(obs.keys())
+    candidates = []
+    if preferred:
+        candidates.append(preferred)
+    for key in LABEL_KEY_FALLBACKS:
+        if key not in candidates:
+            candidates.append(key)
+    for key in candidates:
+        if key in columns:
+            return key
+    return None
+
+
+def standardize_label_column(adata, preferred=None, target="cell_type"):
+    """Copy the best available label column into ``target``.
+
+    Returns
+    -------
+    tuple
+        ``(adata, resolved_key)`` where ``resolved_key`` is ``None`` when no
+        usable label column was found.
+    """
+    label_key = resolve_label_key(adata, preferred=preferred)
+    if label_key is None:
+        return adata, None
+    if label_key != target or target not in adata.obs.columns:
+        adata.obs[target] = adata.obs[label_key].copy()
+    return adata, label_key

@@ -1,4 +1,4 @@
-/* ── Model architecture definitions for PanODE-LAB ── */
+/* ── Model architecture definitions for PanODE-Topic ── */
 /* Unified cool-tone palette: blue → indigo → violet → sky → slate */
 
 export interface LayerDef {

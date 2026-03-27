@@ -17,7 +17,7 @@ Usage:
     python -m benchmarks.figure_generators.composed_figure_validator --series dpmm topic
     python -m benchmarks.figure_generators.composed_figure_validator --series dpmm --figures 6 7 8 10 11 12
 
-Author: PanODE-LAB pipeline
+Author: PanODE-Topic pipeline
 """
 
 import argparse

@@ -28,14 +28,14 @@ def setup_fonts():
 # Series -> set of structured model names (for filtering)
 SERIES_STRUCTURED = {
     "dpmm": {"DPMM-Base", "DPMM-Transformer", "DPMM-Contrastive"},
-    "topic": {"Topic-Base", "Topic-Transformer", "Topic-Contrastive"},
+    "topic": {"Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive"},
 }
 
 # Series -> set of all model names (structured + pure) for that article
 SERIES_MODELS = {
     "dpmm": {"DPMM-Base", "DPMM-Transformer", "DPMM-Contrastive",
              "Pure-AE", "Pure-Transformer-AE", "Pure-Contrastive-AE"},
-    "topic": {"Topic-Base", "Topic-Transformer", "Topic-Contrastive",
+    "topic": {"Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive",
               "Pure-VAE", "Pure-Transformer-VAE", "Pure-Contrastive-VAE"},
 }
 

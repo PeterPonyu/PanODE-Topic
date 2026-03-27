@@ -52,7 +52,7 @@ MODEL_SERIES = {
     ],
     "topic": [
         "Pure-VAE", "Pure-Transformer-VAE", "Pure-Contrastive-VAE",
-        "Topic-Base", "Topic-Contrastive", "Topic-Transformer",
+        "Topic-FM-Base", "Topic-FM-Contrastive", "Topic-FM-Transformer",
     ],
 }
 

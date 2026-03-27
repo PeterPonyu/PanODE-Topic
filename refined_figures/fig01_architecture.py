@@ -209,23 +209,28 @@ def _draw_variant_row(ax, y_base, variant, prior_name, prior_detail,
     SBH = 0.45  # Small box height
     gap = 0.15
 
-    # Variant title
-    ax.text(0.0, y_base + BH + 0.08, variant["name"],
+    # Panel letter (placed far left, clear of boxes)
+    x = 0.0
+    if panel_letter:
+        ax.text(x - 0.18, y_base + BH / 2, f"({panel_letter})",
+                ha="center", va="center", fontsize=14, fontweight="bold",
+                color="black", zorder=10)
+
+    # Variant title — placed well above the Prior box (top at y_base + BH + 0.57)
+    # and above Self-Attention box when present.  The subtitle sits directly
+    # below the title name; both must clear all boxes in the row.
+    has_above_module = variant["extra"] and "Attention" in variant["extra"][0]
+    title_y_offset = 0.82 if has_above_module else 0.75
+    ax.text(x + SBW + gap, y_base + BH + title_y_offset, variant["name"],
             ha="left", va="bottom", fontsize=FONT_TITLE,
             fontweight="bold", color="black", zorder=5)
-    ax.text(0.0, y_base + BH + 0.02, variant["subtitle"],
+    ax.text(x + SBW + gap, y_base + BH + title_y_offset - 0.06, variant["subtitle"],
             ha="left", va="top", fontsize=FONT_SUBLABEL,
             color=C_MID_GREY, zorder=5)
-
-    x = 0.0
 
     # Input box
     _draw_box(ax, (x, y_base), SBW, SBH, "Gene\nExpression",
               facecolor=C_INPUT, edgecolor=C_INPUT_E, fontsize=FONT_SUBLABEL)
-    if panel_letter:
-        ax.text(x - 0.08, y_base + SBH + 0.15, f"({panel_letter})",
-                ha="left", va="bottom", fontsize=14, fontweight="bold",
-                color="black", zorder=10)
 
     # Arrow → Encoder
     x_end_input = x + SBW
@@ -297,9 +302,9 @@ def _draw_variant_row(ax, y_base, variant, prior_name, prior_detail,
                         (ex_x + BW / 2, ex_y + 0.40),
                         color=C_CONTRA_E, linewidth=0.8)
         elif "Attention" in extra_name:
-            # Place above encoder
+            # Place above encoder, below title
             ex_x = x_enc + 0.05
-            ex_y = y_base + BH + 0.22
+            ex_y = y_base + BH + 0.08
             ex_w = BW - 0.10
             _draw_box(ax, (ex_x, ex_y), ex_w, 0.30, extra_name,
                       sublabel=extra_sub,
@@ -348,18 +353,18 @@ def generate(out_dir):
     variants = spec["variants"]
     n_variants = len(variants)
 
-    ROW_H = 2.4
-    fig = plt.figure(figsize=(10.0, ROW_H * n_variants))
+    ROW_H = 3.4
+    fig = plt.figure(figsize=(11.5, ROW_H * n_variants + 0.8))
     ax = bind_figure_region(fig, (0.01, 0.02, 0.99, 0.97)).add_axes(fig)
-    ax.set_xlim(-0.20, 6.80)
-    ax.set_ylim(-1.0, ROW_H * n_variants + 0.3)
+    ax.set_xlim(-0.35, 7.60)
+    ax.set_ylim(-1.0, ROW_H * n_variants + 0.6)
     ax.axis("off")
     ax.set_xticks([])
     ax.set_yticks([])
     fig.patch.set_facecolor(C_WHITE)
 
     # Draw stage backgrounds
-    bg_h = ROW_H * n_variants + 0.8
+    bg_h = ROW_H * n_variants + 1.2
     _draw_stage_bg(ax, (-0.10, -0.80), 1.00, bg_h,
                    "Input", C_INPUT_E, alpha=0.06)
     _draw_stage_bg(ax, (1.00, -0.80), 1.40, bg_h,
@@ -393,8 +398,8 @@ def generate(out_dir):
         (C_CONTRA, C_CONTRA_E, "Contrastive"),
         ("#FCE4EC", "#AD1457", "Flow Match"),
     ]
-    lx = 0.5
-    ly = -0.70
+    lx = 0.0
+    ly = -0.75
     for fc, ec, label in legend_items:
         box = FancyBboxPatch(
             (lx, ly), 0.18, 0.14, boxstyle="round,pad=0.02",
@@ -402,11 +407,14 @@ def generate(out_dir):
         ax.add_patch(box)
         ax.text(lx + 0.22, ly + 0.06, label,
                 fontsize=FONT_SUBLABEL, va="center", color=ec, zorder=5)
-        lx += 0.90
+        lx += 0.93
 
-    out_path = out_dir / "Fig1_arch_topic.png"
-    save_with_vcd(fig, out_path, dpi=DPI, close=True)
-    print(f"  ✓ {out_path.name}")
+    out_path_png = out_dir / "Fig1_arch_topic.png"
+    save_with_vcd(fig, out_path_png, dpi=DPI, close=False)
+    print(f"  ✓ {out_path_png.name}")
+    out_path_pdf = out_dir / "Fig1_arch_topic.pdf"
+    save_with_vcd(fig, out_path_pdf, dpi=DPI, close=True)
+    print(f"  ✓ {out_path_pdf.name}")
 
 
 if __name__ == "__main__":

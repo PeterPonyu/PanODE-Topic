@@ -8,13 +8,30 @@ import math
 
 class PriorMixin:
     """Logistic-normal prior for topic models"""
-    
+
     @staticmethod
     def _dirichlet_to_logistic_normal(alpha: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Convert Dirichlet prior to logistic-normal prior parameters"""
+        """Convert Dirichlet prior to logistic-normal prior parameters.
+
+        Uses the digamma/trigamma moment-matching approximation:
+            mu_k = psi(alpha_k) - (1/K) * sum_j psi(alpha_j)
+            sigma_k = sqrt( psi'(alpha_k) - (1/K^2) * sum_j psi'(alpha_j) )
+
+        where psi is the digamma function and psi' is the trigamma function.
+        This is more accurate than the log-based approximation, especially
+        for small concentration parameters.
+        """
         K = alpha.shape[0]
-        mu = torch.log(alpha) - torch.log(alpha).sum() / K
-        sigma = torch.sqrt((1.0 - 2.0 / K) / alpha + torch.sum(1.0 / alpha) / (K ** 2))
+        # Digamma: psi(alpha)
+        psi = torch.digamma(alpha)
+        mu = psi - psi.sum() / K
+
+        # Trigamma: psi'(alpha) — use torch.special.polygamma(1, x)
+        trigamma = torch.special.polygamma(1, alpha)
+        var_k = trigamma - trigamma.sum() / (K ** 2)
+        # Clamp variance to be positive (numerical safety)
+        var_k = torch.clamp(var_k, min=1e-6)
+        sigma = torch.sqrt(var_k)
         return mu, sigma
     
     def _kl_logistic_normal(self, mu_q, var_q, mu_p, var_p) -> torch.Tensor:

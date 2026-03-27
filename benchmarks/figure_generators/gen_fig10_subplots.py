@@ -111,19 +111,19 @@ INTERNAL_MODEL_ORDER_DPMM = [
     "Pure-AE", "Pure-Transformer-AE", "Pure-Contrastive-AE",
 ]
 INTERNAL_MODEL_ORDER_TOPIC = [
-    "Topic-Base", "Topic-Transformer", "Topic-Contrastive",
+    "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive",
     "Pure-VAE", "Pure-Transformer-VAE", "Pure-Contrastive-VAE",
 ]
 INTERNAL_SHORT_NAMES = {
     "DPMM-Base": "D-B", "DPMM-Transformer": "D-T", "DPMM-Contrastive": "D-C",
     "Pure-AE": "P-AE", "Pure-Transformer-AE": "P-TAE", "Pure-Contrastive-AE": "P-CAE",
-    "Topic-Base": "T-B", "Topic-Transformer": "T-T", "Topic-Contrastive": "T-C",
+    "Topic-FM-Base": "T-B", "Topic-FM-Transformer": "T-T", "Topic-FM-Contrastive": "T-C",
     "Pure-VAE": "P-V", "Pure-Transformer-VAE": "P-TV", "Pure-Contrastive-VAE": "P-CV",
 }
 INTERNAL_COLORS = {
     "DPMM-Base": "#E6550D", "DPMM-Transformer": "#E6550D", "DPMM-Contrastive": "#E6550D",
     "Pure-AE": "#9ECAE1", "Pure-Transformer-AE": "#9ECAE1", "Pure-Contrastive-AE": "#9ECAE1",
-    "Topic-Base": "#756BB1", "Topic-Transformer": "#756BB1", "Topic-Contrastive": "#756BB1",
+    "Topic-FM-Base": "#756BB1", "Topic-FM-Transformer": "#756BB1", "Topic-FM-Contrastive": "#756BB1",
     "Pure-VAE": "#C7E9C0", "Pure-Transformer-VAE": "#C7E9C0", "Pure-Contrastive-VAE": "#C7E9C0",
 }
 
@@ -202,7 +202,7 @@ def _load_internal_best(series="dpmm"):
     df = load_crossdata_combined(prefer_multiseed=True)
 
     if series == "topic":
-        prior_models = {"Topic-Base", "Topic-Transformer", "Topic-Contrastive"}
+        prior_models = {"Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive"}
         ref_label = "Best-Topic"
     else:
         prior_models = {"DPMM-Base", "DPMM-Transformer", "DPMM-Contrastive"}

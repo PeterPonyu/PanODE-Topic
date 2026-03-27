@@ -1,1 +1,1 @@
-"""Experiment framework for PanODE-LAB model evaluation."""
+"""Experiment framework for PanODE-Topic model evaluation."""

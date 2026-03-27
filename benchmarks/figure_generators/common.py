@@ -40,7 +40,7 @@ from .data_loaders import (              # noqa: F401
 # ═══════════════════════════════════════════════════════════════════════════════
 
 PRIOR_MODELS_DPMM = ["DPMM-Base", "DPMM-Transformer", "DPMM-Contrastive"]
-PRIOR_MODELS_TOPIC = ["Topic-Base", "Topic-Transformer", "Topic-Contrastive"]
+PRIOR_MODELS_TOPIC = ["Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive"]
 
 REPRESENTATIVE_DATASETS = ["setty", "endo", "dentate"]
 

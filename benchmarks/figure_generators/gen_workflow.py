@@ -216,7 +216,7 @@ def get_workflow_steps(fig_num: int, series: str = "dpmm") -> list[dict]:
     is_dpmm = series == "dpmm"
     model_family = "DPMM" if is_dpmm else "Topic"
     baseline_family = "Pure-AE" if is_dpmm else "Pure-VAE"
-    base_model = "DPMM-Base" if is_dpmm else "Topic-Base"
+    base_model = "DPMM-Base" if is_dpmm else "Topic-FM-Base"
     n_metrics = "41" if is_dpmm else "6"
     n_core = "6" if is_dpmm else "4"
 

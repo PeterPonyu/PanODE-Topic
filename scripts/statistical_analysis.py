@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Statistical Significance Analysis for PanODE-LAB Benchmarks.
+Statistical Significance Analysis for PanODE-Topic Benchmarks.
 
   1. Wilcoxon signed-rank tests: Structured-prior vs Pure-ablation on each metric
   2. Friedman test: rank-based non-parametric test across all models
@@ -83,9 +83,9 @@ PAIRS = [
     ("DPMM-Base",        "Pure-AE"),
     ("DPMM-Transformer", "Pure-Transformer-AE"),
     ("DPMM-Contrastive", "Pure-Contrastive-AE"),
-    ("Topic-Base",       "Pure-VAE"),
-    ("Topic-Transformer","Pure-Transformer-VAE"),
-    ("Topic-Contrastive","Pure-Contrastive-VAE"),
+    ("Topic-FM-Base",       "Pure-VAE"),
+    ("Topic-FM-Transformer","Pure-Transformer-VAE"),
+    ("Topic-FM-Contrastive","Pure-Contrastive-VAE"),
 ]
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -179,7 +179,7 @@ print("\n=== External-Model Wilcoxon Tests ===")
 EXTERNAL_MODEL_ORDER = sorted(EXTERNAL_MODELS.keys())
 
 PRIOR_MODELS_DPMM = ["DPMM-Base", "DPMM-Transformer", "DPMM-Contrastive"]
-PRIOR_MODELS_TOPIC = ["Topic-Base", "Topic-Transformer", "Topic-Contrastive"]
+PRIOR_MODELS_TOPIC = ["Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive"]
 
 # Load external CSV — pick the one containing the expected external models
 ext_csv_dir = DEFAULT_OUTPUT_DIR / "external" / "csv"

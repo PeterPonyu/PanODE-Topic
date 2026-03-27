@@ -2103,7 +2103,7 @@ def create_publication_figure(analyzer, metrics, figsize=(16, 12), dpi=300,
                             # Slightly increased left margin to avoid y-label /
                             # y-tick overlap with the data region. Right margin
                             # is tightened a little to preserve total width.
-                            left=0.10, right=0.96, top=0.92, bottom=0.12,
+                            left=0.10, right=0.96, top=0.92, bottom=0.18,
                             hspace=0.25, wspace=0.20,
                             # 面板标签样式
                             panel_labels=True, panel_label_start='A',

@@ -5,7 +5,7 @@
 set -e
 
 PYTHON="/home/zeyufu/Desktop/.conda/bin/python"
-ROOT="/home/zeyufu/Desktop/PanODE-LAB"
+ROOT="/home/zeyufu/Desktop/PanODE-Topic"
 MODELS_DIR="$ROOT/benchmarks/benchmark_results/models"
 RESULTS_DIR="$ROOT/benchmarks/biological_validation/results"
 
