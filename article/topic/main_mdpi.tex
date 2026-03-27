@@ -23,6 +23,12 @@
 \raggedbottom
 \setlength{\headheight}{20pt}
 
+% Push float-page figures to top instead of centering vertically
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
 % Float spacing — compact for minimum whitespace
 \setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
 \setlength{\floatsep}{6pt plus 2pt minus 2pt}
@@ -172,9 +178,9 @@ The improvement is not driven by a few favourable datasets: Topic-FM variants co
 \subsection{Internal Ablation}
 Figure~\ref{fig:ablation} presents the full ablation comparing Topic-FM variants against their matched prior-free baselines.
 
-\begin{figure}[tbp]
+\begin{figure}[p]
 \centering
-\panfullfig{ablation/figures/uniform_grid}
+\includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{ablation/figures/uniform_grid}%
 \caption{\textbf{Internal ablation: Topic-FM vs.\ prior-free VAEs.} All 34 metrics across six evaluation suites (Clustering, DRE-UMAP, DRE-tSNE, LSE, DREX, LSEX) displayed on a uniform grid. Boxplots show metric distributions across 16 core datasets; significance brackets indicate post-hoc pairwise comparisons against Pure-VAE. Abbreviated x-axis labels: TFM-Base = Topic-FM-Base, TFM-Trans = Topic-FM-Transformer, TFM-Contr = Topic-FM-Contrastive.}
 \label{fig:ablation}
 \end{figure}
@@ -207,9 +213,9 @@ We validate both pathways on three representative datasets (setty, endo, dentate
 \subsection{External Benchmark}
 Figure~\ref{fig:external} compares the proposed Topic-FM variants on the full 34-metric grid when evaluated alongside 23 external baselines.
 
-\begin{figure}[tbp]
+\begin{figure}[p]
 \centering
-\panfullfig{vs_external/figures/proposed/uniform_grid}
+\includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{vs_external/figures/proposed/uniform_grid}%
 \caption{\textbf{Proposed-model metric profiles in the external benchmark context.} All 34 metrics on a uniform grid for the four Topic-FM variants across 16 core datasets; boxplots show per-dataset distributions with significance brackets. Abbreviated x-axis labels: TFM-Base = Topic-FM-Base, TFM-Trans = Topic-FM-Transformer, TFM-Contr = Topic-FM-Contrastive.}
 \label{fig:external}
 \end{figure}

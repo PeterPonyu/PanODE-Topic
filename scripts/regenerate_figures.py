@@ -574,7 +574,7 @@ def build_series_merge(
     """
     ordered = _order_for_comparison(ablation_methods, focal)
     cfg = MergedExperimentConfig(
-        name=f"{series_name}_vs_external",
+        name=f"{series_name}/vs_external",
         sources=[
             {
                 "tables": str(RESULTS_ROOT / external_dir / "tables"),
