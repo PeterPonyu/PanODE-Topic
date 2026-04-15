@@ -61,6 +61,6 @@ python benchmarks/runners/benchmark_crossdata.py --datasets setty lung endo
 
 ## Notes
 
-- Dataset files are expected under `/home/zeyufu/Desktop/datasets`.
+- Dataset files are expected under the path configured in `PANODE_DATASETS_ROOT` (or passed directly to benchmark commands).
 - Large generated outputs under `benchmarks/`, `experiments/`, and `refined_figures/output/` are treated as regenerable local artefacts.
 - The maintained benchmark registry targets Topic-FM plus Pure-VAE only.
