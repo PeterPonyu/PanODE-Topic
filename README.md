@@ -64,3 +64,16 @@ python benchmarks/runners/benchmark_crossdata.py --datasets setty lung endo
 - Dataset files are expected under the path configured in `PANODE_DATASETS_ROOT` (or passed directly to benchmark commands).
 - Large generated outputs under `benchmarks/`, `experiments/`, and `refined_figures/output/` are treated as regenerable local artefacts.
 - The maintained benchmark registry targets Topic-FM plus Pure-VAE only.
+
+## Citation
+
+```bibtex
+@article{Fu2026PanODETopic,
+  author = {Fu, Zeyu},
+  title  = {Simplex-Constrained Neural Topic VAEs with Flow Refinement},
+  year   = {2026},
+  note   = {Preprint},
+  doi    = {10.64898/2026.03.26.714651},
+  url    = {https://doi.org/10.64898/2026.03.26.714651}
+}
+```
