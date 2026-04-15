@@ -1,3 +1,9 @@
+<div align="center">
+  <a href="https://peterponyu.github.io/">
+    <img src="https://peterponyu.github.io/assets/badges/PanODE-Topic.svg" width="64" alt="ZF Lab · PanODE-Topic">
+  </a>
+</div>
+
 # PanODE-Topic
 
 Topic-flow-matching models for interpretable single-cell representation learning.
