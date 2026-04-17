@@ -1,37 +1,28 @@
-<div align="center">
-  <a href="https://peterponyu.github.io/">
-    <img src="https://peterponyu.github.io/assets/badges/PanODE-Topic.svg" width="64" alt="ZF Lab · PanODE-Topic">
-  </a>
-</div>
-
 # PanODE-Topic
 
 Topic-flow-matching models for interpretable single-cell representation learning.
 
-The current repo focus is the `Topic-FM` family:
+The repository currently focuses on the `Topic-FM` family:
 - `Topic-FM-Base`
 - `Topic-FM-Transformer`
 - `Topic-FM-Contrastive`
 - `Topic-FM-GAT` (optional, when graph dependencies are installed)
 
-Matched baselines remain in scope through the `Pure-VAE` family.
+Matched baselines are included through the `Pure-VAE` family.
 
-## Active Layout
+## Project Layout
 
 ```text
 PanODE-Topic/
 ├── models/                   # Topic-FM, Topic, and Pure-VAE implementations
-├── benchmarks/               # Active internal benchmarking + biological validation
-├── eval_lib/                 # External baseline wrappers and evaluation utilities
-├── refined_figures/          # Publication-quality figure generators
-├── experiments/              # External comparison pipeline and merged outputs
-├── article/                  # Manuscript sources
-├── utils/                    # Shared training/data/viz helpers
-├── src/                      # Figure layout / visualization helpers
+├── benchmarks/               # Training and evaluation runners
+├── eval_lib/                 # Baseline wrappers and evaluation utilities
+├── utils/                    # Shared training, data, and visualization helpers
+├── src/                      # Visualization helpers
 └── vcd/                      # Visual consistency diagnostics
 ```
 
-## Active Benchmark Models
+## Model Families
 
 | Model | Encoder | Prior | Flow Matching |
 |-------|---------|-------|---------------|
@@ -43,7 +34,7 @@ PanODE-Topic/
 | `Pure-Transformer-VAE` | Self-attention | Gaussian | No |
 | `Pure-Contrastive-VAE` | MLP + MoCo | Gaussian | No |
 
-## Current Defaults
+## Default Settings
 
 | Parameter | Value |
 |-----------|-------|
@@ -67,19 +58,5 @@ python benchmarks/runners/benchmark_crossdata.py --datasets setty lung endo
 
 ## Notes
 
-- Dataset files are expected under the path configured in `PANODE_DATASETS_ROOT` (or passed directly to benchmark commands).
-- Large generated outputs under `benchmarks/`, `experiments/`, and `refined_figures/output/` are treated as regenerable local artefacts.
-- The maintained benchmark registry targets Topic-FM plus Pure-VAE only.
-
-## Citation
-
-```bibtex
-@article{Fu2026PanODETopic,
-  author = {Fu, Zeyu},
-  title  = {Simplex-Constrained Neural Topic VAEs with Flow Refinement},
-  year   = {2026},
-  note   = {Preprint},
-  doi    = {10.64898/2026.03.26.714651},
-  url    = {https://doi.org/10.64898/2026.03.26.714651}
-}
-```
+- Configure dataset locations through your local benchmark setup before running the benchmark scripts.
+- The maintained benchmark registry targets the Topic-FM and Pure-VAE families.
