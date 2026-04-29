@@ -10,13 +10,20 @@ The repository currently focuses on the `Topic-FM` family:
 
 Matched baselines are included through the `Pure-VAE` family.
 
-## Project Layout
+## Repository Layout Highlights
+
+This intentionally non-exhaustive overview lists the main public-facing areas
+and omits local data paths, generated outputs, and registry-specific details.
 
 ```text
 PanODE-Topic/
 ├── models/                   # Topic-FM, Topic, and Pure-VAE implementations
-├── benchmarks/               # Training and evaluation runners
+├── benchmarks/               # Training, evaluation, and validation workflows
 ├── eval_lib/                 # Baseline wrappers and evaluation utilities
+├── article/                  # Manuscript-facing materials
+├── experiments/              # External comparison and analysis workflows
+├── refined_figures/          # Figure refinement utilities
+├── scripts/                  # Maintenance and workflow helpers
 ├── utils/                    # Shared training, data, and visualization helpers
 ├── src/                      # Visualization helpers
 └── vcd/                      # Visual consistency diagnostics
@@ -51,12 +58,14 @@ PanODE-Topic/
 ## Running
 
 ```bash
-python benchmarks/runners/benchmark_base.py --series topic
-python benchmarks/runners/benchmark_base.py --models Topic-FM-Transformer Pure-VAE
-python benchmarks/runners/benchmark_crossdata.py --datasets setty lung endo
+python benchmarks/runners/benchmark_base.py --series topic --data-path <dataset-path>
+python benchmarks/runners/benchmark_base.py --models Topic-FM-Transformer Pure-VAE --data-path <dataset-path>
+python benchmarks/runners/benchmark_crossdata.py --datasets <dataset-key> <dataset-key>
 ```
 
 ## Notes
 
-- Configure dataset locations through your local benchmark setup before running the benchmark scripts.
+- For base or single-dataset runs, pass a local dataset with `--data-path`.
+- For cross-dataset runs, `--datasets` selects configured registry keys; align your local registry/config before running those workflows.
+- README examples use placeholders for local data and registry-specific values.
 - The maintained benchmark registry targets the Topic-FM and Pure-VAE families.
