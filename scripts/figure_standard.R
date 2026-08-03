@@ -47,8 +47,8 @@ std_theme <- function(base_size = STD_BASE_SIZE) {
 ## --- 实测:画布尺寸 = panel 绝对尺寸 + 全部文本延展 ---------------------
 measure_canvas <- function(g) {
   list(
-    w_in = convertWidth(sum(g$widths), "in", valueOnly = TRUE) + 0.04,
-    h_in = convertHeight(sum(g$heights), "in", valueOnly = TRUE) + 0.04
+    w_in = convertWidth(sum(g$widths), "in", valueOnly = TRUE) + 0.08,
+    h_in = convertHeight(sum(g$heights), "in", valueOnly = TRUE) + 0.08
   )
 }
 
@@ -78,4 +78,68 @@ save_pdf_std <- function(p, file, plot_w_in, plot_h_in, base_size = STD_BASE_SIZ
   grid.draw(fitted$grob)
   dev.off()
   invisible(fitted)
+}
+
+## --- 组合图标准(2026-08-03 增补)----------------------------------------
+## 问题:patchwork/cowplot 的自动排版不识别各子图的注释文本量(y tick 最宽
+## 标签、旋转 x 标签、strip/legend),长文本子图会被压 plot 区域或裁剪。
+## 规则:逐子图独立实测(保留各子图自有 theme),列宽 = 该列各子图实测宽
+## 最大值,行高同理;画布 = 各列宽之和 x 各行高之和。
+
+## 保留子图自有 theme 的 fit(tessera 模式):std_theme 先应用,p$theme 后挂回
+fit_panel_keep <- function(p, plot_w_in, plot_h_in, base_size = STD_BASE_SIZE) {
+  th <- p$theme
+  g <- ggplotGrob(p + std_theme(base_size) + th)
+  g <- .lock_panel_size(g, plot_w_in, plot_h_in)
+  c(list(grob = g), measure_canvas(g))
+}
+
+## panels: ggplot 列表(按行优先顺序);ncol: 列数
+## 返回 list(patchwork, w_in, h_in, cell_w, cell_h)
+compose_std <- function(panels, ncol, plot_w_in, plot_h_in,
+                        base_size = STD_BASE_SIZE) {
+  if (!requireNamespace("patchwork", quietly = TRUE)) stop("patchwork required")
+  fits <- lapply(panels, fit_panel_keep, plot_w_in, plot_h_in, base_size)
+  n <- length(fits)
+  nrow <- ceiling(n / ncol)
+  idx <- matrix(c(seq_len(n), rep(NA, nrow * ncol - n)), nrow = nrow, byrow = TRUE)
+  col_w <- vapply(seq_len(ncol), function(j)
+    max(vapply(idx[, j][!is.na(idx[, j])], function(i) fits[[i]]$w_in, numeric(1))),
+    numeric(1))
+  row_h <- vapply(seq_len(nrow), function(i)
+    max(vapply(idx[i, ][!is.na(idx[i, ])], function(j) fits[[j]]$h_in, numeric(1))),
+    numeric(1))
+  cells <- lapply(fits, function(f) patchwork::wrap_elements(full = f$grob))
+  comp <- Reduce(`|`, cells[seq_len(min(ncol, n))])
+  if (nrow > 1) {
+    rows <- vector("list", nrow)
+    for (i in seq_len(nrow)) {
+      row_cells <- cells[idx[i, ][!is.na(idx[i, ])]]
+      rows[[i]] <- Reduce(`|`, row_cells)
+    }
+    comp <- Reduce(`/`, rows)
+  }
+  list(patchwork = comp, w_in = sum(col_w), h_in = sum(row_h),
+       cell_w = col_w, cell_h = row_h, fits = fits)
+}
+
+save_pdf_composed <- function(panels, file, ncol, plot_w_in, plot_h_in,
+                              base_size = STD_BASE_SIZE) {
+  c <- compose_std(panels, ncol, plot_w_in, plot_h_in, base_size)
+  pdf(file, width = c$w_in, height = c$h_in, useDingbats = FALSE)
+  print(c$patchwork)
+  dev.off()
+  message(sprintf("%s: %d panels -> canvas %.2fx%.2f in",
+                  basename(file), length(panels), c$w_in, c$h_in))
+  invisible(c)
+}
+
+save_tikz_composed <- function(panels, file, ncol, plot_w_in, plot_h_in,
+                               base_size = STD_BASE_SIZE, sanitize = TRUE) {
+  c <- compose_std(panels, ncol, plot_w_in, plot_h_in, base_size)
+  tikzDevice::tikz(file, width = c$w_in, height = c$h_in,
+                   sanitize = sanitize, standAlone = FALSE)
+  print(c$patchwork)
+  dev.off()
+  invisible(c)
 }

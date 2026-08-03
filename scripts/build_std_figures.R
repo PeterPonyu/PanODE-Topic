@@ -48,6 +48,15 @@ save_std <- function(plot, old_target, name, plot_w, plot_h) {
   invisible(path)
 }
 
+save_composed_std <- function(panels, old_target, name, ncol, plot_w, plot_h) {
+  path <- file.path(out_dir, paste0(name, ".tex"))
+  fitted <- save_tikz_composed(panels, path, ncol = ncol,
+                               plot_w_in = plot_w, plot_h_in = plot_h,
+                               base_size = STD_BASE_SIZE, sanitize = TRUE)
+  record_dim(old_target, path, fitted, plot_w, plot_h)
+  invisible(path)
+}
+
 read_metric_tables <- function(subdir = "ablation") {
   tables_dir <- file.path(repo_root, "experiments", "results", "topic", subdir, "tables")
   files <- sort(list.files(tables_dir, pattern = "_df[.]csv$", full.names = TRUE))
@@ -88,7 +97,7 @@ metric_specs <- data.frame(
              "LSE_anisotropy_score", "LSE_core_quality", "LSE_manifold_dimensionality", "LSE_noise_resilience", "LSE_overall_quality", "LSE_participation_ratio", "LSE_spectral_decay_rate", "LSE_trajectory_directionality",
              "DREX_continuity", "DREX_distance_pearson", "DREX_distance_spearman", "DREX_local_scale_quality", "DREX_neighborhood_symmetry", "DREX_overall_quality", "DREX_trustworthiness",
              "LSEX_entropy_stability", "LSEX_local_curvature", "LSEX_overall_quality", "LSEX_radial_concentration", "LSEX_two_hop_connectivity"),
-  label = c("NMI", "ARI", "ASW", "DAV↓", "CAL", "COR",
+  label = c("NMI", "ARI", "ASW", "DAV low", "CAL", "COR",
             "UMAP dist.", "UMAP local", "UMAP global", "UMAP overall", "UMAP k-max",
             "t-SNE dist.", "t-SNE local", "t-SNE global", "t-SNE overall", "t-SNE k-max",
             "Anisotropy", "Core qual.", "Manifold dim.", "Noise resil.", "LSE overall", "Participation", "Spectral decay", "Trajectory",
@@ -143,25 +152,50 @@ make_architecture <- function() {
 }
 
 make_crossdataset <- function(all_df) {
-  metrics <- c("NMI", "ARI", "ASW", "DAV")
   keep <- all_df[all_df$method %in% c("Pure-VAE", "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive"), ]
-  pairs <- list(c("NMI", "ASW"), c("NMI", "DAV"), c("ARI", "ASW"), c("ARI", "DAV"))
-  out <- do.call(rbind, lapply(pairs, function(pair) {
-    d <- keep[, c("dataset", "method", pair)]
-    names(d)[3:4] <- c("x", "y")
-    d$panel <- paste(pair[1], "vs", pair[2])
-    d$xlab <- pair[1]
-    d$ylab <- pair[2]
-    d
-  }))
-  out$method <- factor(out$method, levels = c("Pure-VAE", "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive"))
-  ggplot(out, aes(x = x, y = y, color = method)) +
-    geom_point(alpha = 0.65, size = 1.2) +
+  keep$method <- factor(keep$method, levels = c("Pure-VAE", "Topic-FM-Base", "Topic-FM-Transformer", "Topic-FM-Contrastive"))
+  short_labels <- c("Pure-VAE" = "PV", "Topic-FM-Base" = "Base",
+                    "Topic-FM-Transformer" = "Trans", "Topic-FM-Contrastive" = "Contr")
+
+  geometry_scatter <- ggplot(keep, aes(x = ASW, y = DAV, color = method)) +
+    geom_point(alpha = 0.68, size = 1.25) +
     geom_smooth(method = "lm", se = FALSE, linewidth = 0.35, alpha = 0.8) +
-    facet_wrap(~panel, scales = "free", ncol = 2) +
     scale_color_manual(values = method_cols, labels = method_labels, drop = FALSE, name = "Model") +
-    labs(x = "Concordance metric", y = "Geometry metric") +
-    theme(legend.position = "bottom", panel.grid.minor = element_blank())
+    labs(title = "Geometry trade-off", x = "ASW (higher is better)", y = "DAV (lower is better)") +
+    theme(legend.position = "bottom", panel.grid.minor = element_blank(),
+          legend.key.width = unit(0.12, "in"), legend.spacing.x = unit(0.02, "in"))
+
+  metric_panel <- function(metric, title, ylab) {
+    ggplot(keep, aes(x = method, y = .data[[metric]], fill = method)) +
+      geom_boxplot(width = 0.58, outlier.size = 0.35, linewidth = 0.2) +
+      stat_summary(fun = median, geom = "point", shape = 23, size = 0.85,
+                   fill = "white", color = "#111827", stroke = 0.2) +
+      scale_x_discrete(labels = short_labels) +
+      scale_fill_manual(values = method_cols, guide = "none") +
+      labs(title = title, x = NULL, y = ylab) +
+      theme(axis.text.x = element_text(size = 5.7), panel.grid.minor = element_blank())
+  }
+
+  concordance <- do.call(rbind, lapply(c("NMI", "ARI"), function(metric) {
+    data.frame(method = keep$method, value = keep[[metric]], metric = metric,
+               stringsAsFactors = FALSE)
+  }))
+  concordance$metric <- factor(concordance$metric, levels = c("NMI", "ARI"))
+  compact_concordance <- ggplot(concordance, aes(x = method, y = value, fill = method)) +
+    geom_boxplot(width = 0.55, outlier.size = 0.28, linewidth = 0.18) +
+    facet_wrap(~metric, scales = "free_y", ncol = 2) +
+    scale_x_discrete(labels = short_labels) +
+    scale_fill_manual(values = method_cols, guide = "none") +
+    labs(title = "Compact concordance context", x = NULL, y = "Score") +
+    theme(axis.text.x = element_text(size = 4.8), strip.text = element_text(size = 6.2),
+          panel.grid.minor = element_blank(), panel.spacing = unit(0.05, "in"))
+
+  list(
+    geometry_scatter,
+    metric_panel("ASW", "Internal geometry: ASW", "ASW"),
+    metric_panel("DAV", "Internal geometry: DAV", "DAV (lower is better)"),
+    compact_concordance
+  )
 }
 
 make_uniform_grid <- function(all_df) {
@@ -190,9 +224,9 @@ make_uniform_grid <- function(all_df) {
     scale_x_discrete(labels = grid_labels) +
     scale_fill_manual(values = method_cols, guide = "none") +
     labs(x = NULL, y = "Metric value") +
-    theme(axis.text.x = element_text(angle = 0, hjust = 0.5, vjust = 1, size = 4.4),
-          strip.text = element_text(size = 5.8),
-          panel.spacing = unit(0.065, "in"),
+    theme(axis.text.x = element_text(angle = 0, hjust = 0.5, vjust = 1, size = 4.0),
+          strip.text = element_text(size = 5.6),
+          panel.spacing = unit(0.085, "in"),
           panel.grid.minor = element_blank())
 }
 
@@ -216,8 +250,8 @@ all_df <- read_metric_tables("ablation")
 check_contradictions(all_df)
 
 save_std(make_architecture(), "Fig1_arch_topic", "Fig1_arch_topic_std", 6.65, 3.00)
-save_std(make_crossdataset(all_df), "Fig5_crossdataset_topic", "Fig5_crossdataset_topic_std", 2.25, 1.65)
-save_std(make_uniform_grid(all_df), "ablation/figures/uniform_grid", "uniform_grid_topic_std", 0.74, 1.05)
+save_composed_std(make_crossdataset(all_df), "Fig5_crossdataset_topic", "Fig5_crossdataset_topic_std", 2, 2.25, 1.45)
+save_std(make_uniform_grid(all_df), "ablation/figures/uniform_grid", "uniform_grid_topic_std", 0.82, 1.05)
 
 write.csv(dims, file.path(out_dir, "figure_dimensions.csv"), row.names = FALSE)
 writeLines(contradictions, file.path(out_dir, "figure_contradictions.txt"))
