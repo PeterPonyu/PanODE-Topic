@@ -31,8 +31,9 @@ for series in dpmm topic; do
   if [ -d "$SERIES_SRC" ]; then
     # Remove existing symlink or directory
     rm -rf "$SERIES_DST"
-    ln -s "$SERIES_SRC" "$SERIES_DST"
-    echo "  ✓ $series → $SERIES_SRC"
+    # Prefer relative symlink so public tip never embeds $HOME.
+    ln -sfr "$SERIES_SRC" "$SERIES_DST"
+    echo "  ✓ $series → $(readlink "$SERIES_DST")"
   else
     echo "  ⚠ $SERIES_SRC not found (run generate_subplots.py first)"
   fi
@@ -43,8 +44,8 @@ STAT_SRC="$SUBPLOTS_BASE/statistical"
 STAT_DST="$PUBLIC_DIR/statistical"
 if [ -d "$STAT_SRC" ]; then
   rm -rf "$STAT_DST"
-  ln -s "$STAT_SRC" "$STAT_DST"
-  echo "  ✓ statistical → $STAT_SRC"
+  ln -sfr "$STAT_SRC" "$STAT_DST"
+  echo "  ✓ statistical → $(readlink "$STAT_DST")"
 else
   echo "  ⚠ $STAT_SRC not found (run generate_statistical_figures.py first)"
 fi
