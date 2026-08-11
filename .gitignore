@@ -127,3 +127,24 @@ paper/
 manuscript/
 latex/
 docs/ARTICLE_PLAN.tex
+
+# --- dual-plane: submission capsules live outside this workbench ---
+# Plane C worktrees: labs/capsules/<id>/ (host: submission-capsules)
+/paper/
+/manuscript/
+/submission/
+/submission_flat/
+/peerj_workspace/
+/submission_figures/
+Rplots.pdf
+.omc/
+.omx/
+.claude/worktrees/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+

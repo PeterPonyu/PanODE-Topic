@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 import path from "path";
 
 const BASE = "http://localhost:3099/figure1";
-const OUT = "/home/zeyufu/Desktop/PanODE-Topic/benchmarks/paper_figures";
+const OUT = "/home/zeyufu/Desktop/labs/active/PanODE-Topic/benchmarks/paper_figures";
 
 for (const series of ["dpmm", "topic"]) {
   const browser = await chromium.launch();
