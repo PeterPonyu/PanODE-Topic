@@ -10,4 +10,4 @@ Method-R&D freeze: text/bib/doc only for current P1 closeout. Explicitly **out o
 | AUDIT registry / label_key / fit_epochs restoration | Deferred | `import benchmarks.model_registry` currently succeeds (7 models); stale AUDIT High #1 not mandatory |
 | Merge with PanODE-DPMM | **Forbidden** | Sister papers only; complementary regimes; never one merged manuscript |
 
-MoCoO↔PanODE dual-submission boundary is an **MDPI upload gate** (see ralplan Consensus log), not a science-debt item.
+MoCoO↔PanODE dual-submission boundary is an **upload-gate / venue-ops** item (tracked outside this public tip), not a science-debt item.

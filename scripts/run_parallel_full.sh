@@ -7,8 +7,9 @@
 # Usage: bash scripts/run_parallel_full.sh
 
 set -u
-PYTHON=/home/zeyufu/miniconda3/envs/dl/bin/python
-cd /home/zeyufu/Desktop/PanODE-Topic
+PYTHON="${PYTHON:-python3}"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
 LOGDIR=scripts/parallel_logs
 mkdir -p "$LOGDIR"
 

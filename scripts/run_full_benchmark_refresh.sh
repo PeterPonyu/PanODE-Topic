@@ -6,8 +6,8 @@
 #
 # Usage: bash scripts/run_full_benchmark_refresh.sh
 
-PYTHON=/home/zeyufu/miniconda3/envs/dl/bin/python
-PROJECT_ROOT=/home/zeyufu/Desktop/PanODE-Topic
+PYTHON="${PYTHON:-python3}"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 echo "============================================================"

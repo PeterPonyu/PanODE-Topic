@@ -13,7 +13,7 @@ This audit is based on:
 This audit does not include:
 - Re-running any training.
 - Recomputing metrics.
-- Verifying raw external datasets under `/home/zeyufu/Desktop/datasets`.
+- Verifying raw external datasets under `$PANODE_DATASETS_ROOT` (or `~/datasets`).
 - Reviewing every generated artifact file one by one.
 
 ## Highest-Priority Findings
@@ -40,7 +40,7 @@ This audit does not include:
    - Impact: annotated labels can be missed, with fallback to pseudo-labels or inconsistent evaluation.
 
 5. [High] The data pipeline is broad but not self-contained.
-   - Dataset paths are hardcoded under `/home/zeyufu/Desktop/datasets`.
+   - Dataset roots should be supplied via `PANODE_DATASETS_ROOT` (see `benchmarks/dataset_registry.py`).
    - The repository does not ship the `.h5ad` files or a full versioned dataset manifest.
    - Impact: external auditors cannot independently verify data sufficiency from the repo alone.
 

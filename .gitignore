@@ -128,8 +128,8 @@ manuscript/
 latex/
 docs/ARTICLE_PLAN.tex
 
-# --- dual-plane: submission capsules live outside this workbench ---
-# Plane C worktrees: labs/capsules/<id>/ (host: submission-capsules)
+# --- submission packaging lives outside this workbench ---
+# Ignore local capsule / portal worktrees if present beside the clone
 /paper/
 /manuscript/
 /submission/

@@ -28,8 +28,14 @@ from dataclasses import dataclass
 class BenchmarkConfig:
     """Configuration for benchmark runs."""
     
-    # Data
-    data_path: Path = Path("/home/zeyufu/Desktop/datasets/DevelopmentDatasets/setty.h5ad")
+    # Data (override via PANODE_DATASETS_ROOT; default ~/datasets)
+    data_path: Path = (
+        Path(os.environ.get("PANODE_DATASETS_ROOT", str(Path.home() / "datasets")))
+        .expanduser()
+        .resolve()
+        / "DevelopmentDatasets"
+        / "setty.h5ad"
+    )
     data_type: str = "trajectory"
     
     # Model architecture

@@ -80,7 +80,7 @@ if printf '%s\n' "${FIGURES[@]}" | grep -qx '1'; then
   cd "$PROJ_ROOT"
   for s in "${SERIES[@]}"; do
     if [[ "$s" = "topic" ]]; then
-      /home/zeyufu/miniconda3/envs/dl/bin/python -m refined_figures.generate_all --figures 1
+      "${PYTHON:-python3}" -m refined_figures.generate_all --figures 1
     fi
   done
 
