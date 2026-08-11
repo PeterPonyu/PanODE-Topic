@@ -6,8 +6,8 @@
 
 set -e
 
-PYTHON="/home/zeyufu/miniconda3/envs/dl/bin/python"
-ROOT="/home/zeyufu/Desktop/PanODE-Topic"
+PYTHON="${PYTHON:-python3}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MODELS_DIR="$ROOT/benchmarks/benchmark_results/models"
 RESULTS_DIR="$ROOT/benchmarks/biological_validation/results"
 DATASET="setty"

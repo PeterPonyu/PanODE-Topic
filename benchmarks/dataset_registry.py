@@ -2,12 +2,23 @@
 
 Centralizes dataset paths, label keys, and metadata so multiple benchmark
 entry scripts do not duplicate the same large registry block.
+
+Path policy
+-----------
+Set ``PANODE_DATASETS_ROOT`` to the directory that contains
+``DevelopmentDatasets/``, ``CancerDatasets/``, etc.  Optional
+``PANODE_EXTRA_DATASETS_ROOT`` overrides the preprocessed extras tree
+(default: ``$PANODE_DATASETS_ROOT/extra_preprocessed``).  If the env var
+is unset, falls back to ``~/datasets`` (home-agnostic; no machine path).
 """
 
+import os
 from pathlib import Path
 
 
-DATASETS_ROOT = Path("/home/zeyufu/Desktop/datasets")
+DATASETS_ROOT = Path(
+    os.environ.get("PANODE_DATASETS_ROOT", str(Path.home() / "datasets"))
+).expanduser().resolve()
 
 DATASET_REGISTRY = {
     "setty": {
@@ -98,7 +109,12 @@ DATASET_REGISTRY = {
 
 
 # ── Extra / sample datasets (run after prep_extra_datasets.py) ───────────────
-EXTRA_DATASETS_ROOT = Path("/home/zeyufu/Desktop/datasets/extra_preprocessed")
+EXTRA_DATASETS_ROOT = Path(
+    os.environ.get(
+        "PANODE_EXTRA_DATASETS_ROOT",
+        str(DATASETS_ROOT / "extra_preprocessed"),
+    )
+).expanduser().resolve()
 
 EXTRA_DATASET_REGISTRY = {
     # -- Labeled developmental / disease -----------------------------------

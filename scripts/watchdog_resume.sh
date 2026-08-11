@@ -5,8 +5,9 @@
 # Usage: nohup bash scripts/watchdog_resume.sh > scripts/parallel_logs/watchdog.log 2>&1 &
 
 set -u
-PYTHON=/home/zeyufu/miniconda3/envs/dl/bin/python
-cd /home/zeyufu/Desktop/PanODE-Topic
+PYTHON="${PYTHON:-python3}"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$PROJECT_ROOT"
 LOGDIR=scripts/parallel_logs
 mkdir -p "$LOGDIR"
 
