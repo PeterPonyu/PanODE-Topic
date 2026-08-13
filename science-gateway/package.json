@@ -1,0 +1,30 @@
+{
+  "name": "panode-topic-science-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && node scripts/post-export.mjs && node scripts/sync-docs.mjs",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "verify": "node scripts/verify-export.mjs"
+  },
+  "dependencies": {
+    "next": "15.5.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "15.3.1",
+    "postcss": "8.5.10",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  }
+}
