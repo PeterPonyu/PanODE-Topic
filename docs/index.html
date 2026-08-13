@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PanODE-Topic · Simplex topic VAEs and β gene programs</title>
+  <meta name="description" content="Paper companion for PanODE-Topic: simplex-constrained neural topic VAEs with flow refinement for interpretable single-cell gene-program discovery.">
+  <meta name="author" content="Zeyu Fu">
+  <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#0d9488">
+  <link rel="canonical" href="https://peterponyu.github.io/PanODE-Topic/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="preview-banner">
+    <div class="wrap-wide"><strong>Pages not published.</strong> This is a static preview in <span class="mono">docs/</span>. The live URL <span class="mono">peterponyu.github.io/PanODE-Topic/</span> is still HTTP 404 — the Site badge stays disabled. Canonical slug <span class="mono">topic</span>.</div>
+  </div>
+  <header class="site-header">
+    <div class="wrap-wide header-inner">
+      <a class="wordmark" href="#home">
+        <span class="wordmark-mark" aria-hidden="true">PT</span>
+        <span class="wordmark-name">PanODE</span>
+        <span class="wordmark-sub topic">Topic</span>
+      </a>
+      <nav class="nav-primary" aria-label="Primary">
+        <a href="#home">Home</a>
+        <a href="#abstract">Abstract</a>
+        <a href="#figures">Figures</a>
+        <a href="#code">Code</a>
+        <a href="#cite">Cite</a>
+      </nav>
+      <div class="header-chips">
+        <a class="chip" href="https://peterponyu.github.io/" rel="noopener noreferrer" target="_blank">Homepage</a>
+        <a class="chip" href="https://peterponyu.github.io/scportal/" rel="noopener noreferrer" target="_blank">SCPortal</a>
+      </div>
+      <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="mobile-nav">
+        <span data-label>Menu</span>
+        <span aria-hidden="true">☰</span>
+      </button>
+    </div>
+    <div class="mobile-nav" id="mobile-nav">
+      <nav aria-label="Mobile">
+        <a href="#home">Home</a>
+        <a href="#abstract">Abstract</a>
+        <a href="#figures">Figures</a>
+        <a href="#code">Code</a>
+        <a href="#cite">Cite</a>
+        <div class="mobile-graph">
+          <a href="https://peterponyu.github.io/" rel="noopener noreferrer" target="_blank">Homepage — ZF Lab</a>
+          <a href="https://peterponyu.github.io/scportal/" rel="noopener noreferrer" target="_blank">SCPortal — discovery hub</a>
+          <a href="https://github.com/PeterPonyu/PanODE-DPMM" rel="noopener noreferrer" target="_blank">DPMM — sister method (Code)</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="home">
+      <div class="wrap">
+        <p class="kicker">ZF Lab · PanODE · slug topic</p>
+        <h1><span class="brand-panode">PanODE</span> <span class="brand-topic">Topic</span></h1>
+        <p class="lead">Topic proportions on the simplex, and decoder <strong>β gene programs</strong>. Flow matching tightens geometry; it does not rewrite β. Not a clustering bake-off, and <em>not an NMI win</em>.</p>
+        <div class="pills">
+          <a class="pill pill-primary" href="#figures">See gene programs</a>
+          <a class="pill pill-ghost" href="#abstract">Read the abstract</a>
+          <a class="pill pill-ghost" href="https://github.com/PeterPonyu/PanODE-Topic" rel="noopener noreferrer" target="_blank">Public code</a>
+        </div>
+        <div class="stats">
+          <div class="stat-tile"><strong>11</strong><span>named Wilcoxon externals</span></div>
+          <div class="stat-tile"><strong>12</strong><span>N_pairs (matched)</span></div>
+          <div class="stat-tile"><strong>407</strong><span>rows = 11 × 37</span></div>
+          <div class="stat-tile"><strong>10</strong><span>topics / simplex dim</span></div>
+        </div>
+
+        <article class="paper-card">
+          <span class="disc" aria-hidden="true">1</span>
+          <div>
+            <h2>Simplex-Constrained Neural Topic VAEs with Flow Refinement for Interpretable Single-Cell Gene-Program Discovery</h2>
+            <p class="paper-meta"><strong>Fu, Z.</strong> · <em>MDPI biology manuscript</em> · 2026 · article DOI pending</p>
+            <div class="badges">
+              <span class="badge badge-doi is-disabled" title="No article DOI — omitted until real">DOI</span>
+              <a class="badge badge-code" href="https://github.com/PeterPonyu/PanODE-Topic" rel="noopener noreferrer" target="_blank">Code</a>
+              <span class="badge badge-site is-disabled" title="Site badge enables once Pages returns HTTP 200">Site</span>
+            </div>
+          </div>
+        </article>
+
+        <div class="split-stats" id="split-lock">
+          <div class="callout callout-blue">
+            <p class="split-label">Pure-VAE · label concordance</p>
+            <h3>Leads NMI and ARI</h3>
+            <div class="split-nums">
+              <div><strong>0.564</strong><span>NMI</span></div>
+              <div><strong>0.363</strong><span>ARI</span></div>
+            </div>
+            <p>Gaussian-prior baseline. These two numbers are the concordance lock. Topic-FM does not win NMI or ARI.</p>
+          </div>
+          <div class="callout callout-teal">
+            <p class="split-label"><span class="mono">Topic-FM-Transformer</span> · geometry</p>
+            <h3>Leads ASW and DAV</h3>
+            <div class="split-nums">
+              <div><strong>0.501</strong><span>ASW</span></div>
+              <div><strong>0.763</strong><span>DAV</span></div>
+            </div>
+            <p><em>Not an NMI win.</em> Flow matching sharpens contours; it does not flip 16-core NMI/ARI.</p>
+          </div>
+        </div>
+
+        <div class="partition-hero">
+          <figure class="figure-card hero-figure card-hover" id="beta-hero">
+            <button type="button" class="thumb" data-full="figures/F06.png" aria-label="Open Fig. 6 · Biological validation">
+              <img src="figures/F06.png" alt="Setty perturbation-importance heatmaps for Topic-FM-Base and Topic-FM-Transformer plus decoder-beta readouts for Base and Contrastive" width="1200" height="900">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 6 · β gene programs</strong> <span class="chip-f chip-bio">biology</span></div>
+              <p>Perturbation modules and decoder β signatures on setty. (A) Topic-FM-Base heat; (B) Topic-FM-Transformer heat; (C) decoder-β Base; (D) decoder-β Contrastive. Flow matching does not rewrite β. Not Fig. 2, and not an NMI win.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="callout exclude-note">
+          <h3>What this site is not</h3>
+          <p>Not a Topic-FM NMI/ARI win. Wilcoxon is 11 named externals, N_pairs = 12, 407 = 11 × 37 metric rows — not 56 × 18. Figs 6–9 are the gene-program object; Fig. 2 is A scatter / B ASW boxes / C DAV boxes / D NMI/ARI boxes. Topic-GAT has no biological panel. The in-repo <span class="mono">model-arch-viewer/</span> is an internal figure-export tool, not this Site. Main-text rasters are copied into <span class="mono">docs/figures/</span>. Fig. 2 stays caption-only: the live R figure is TikZ, and the on-disk PNG is a four-scatter that does not match that caption.</p>
+        </div>
+
+        <div class="routes" style="margin-top:1.5rem">
+          <a class="route-card card-hover" href="#abstract"><span class="disc disc-lg">01</span><div><h3>Abstract</h3><p>MDPI abstract with the concordance–geometry split written as a split, not as Topic-FM dominance.</p></div></a>
+          <a class="route-card card-hover" href="#figures"><span class="disc disc-lg">02</span><div><h3>Figures</h3><p>Programs 6–9 first. Figs 2–4 and 10 tagged as geometry or clustering. GAT gap is copy.</p></div></a>
+          <a class="route-card card-hover" href="#code"><span class="disc disc-lg">03</span><div><h3>Code</h3><p>Public MIT repo. Topic-FM and Pure-VAE families. Viewer stays local.</p></div></a>
+          <a class="route-card card-hover" href="#cite"><span class="disc disc-lg">04</span><div><h3>Cite</h3><p>Preprint stub plus the public repository. No invented article DOI.</p></div></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="abstract">
+      <div class="wrap">
+        <p class="kicker">Abstract</p>
+        <h2 class="section-title">Simplex topics, then a locked split</h2>
+        <p class="deck">From the MDPI manuscript. This page does not headline a Topic-FM NMI/ARI win. Wilcoxon scope stays 11 externals × 37 metrics.</p>
+        <div class="abstract-prose">
+          <p>Variational autoencoders for single-cell transcriptomics typically learn Gaussian latent spaces that lack part-based interpretability: individual latent dimensions carry no inherent biological meaning and the decoder provides no explicit gene-program readout. We introduce Topic-FM, a family of neural topic VAEs in which a logistic-normal Dirichlet prior constrains the latent vector to the probability simplex, turning each coordinate into a topic proportion and the decoder weight matrix into a directly readable topic–gene signature. A conditional optimal-transport flow field, trained entirely in pre-softmax ℝ<sup>K</sup>, sharpens posterior geometry without modifying the decoder or breaking simplex validity.</p>
+          <p><strong>16-core ablation lock.</strong> On the verified 16-core ablation export, Pure-VAE leads mean NMI (0.564) and ARI (0.363), whereas <span class="mono">Topic-FM-Transformer</span> leads ASW (0.501) and DAV (0.763) — a concordance–geometry split, not uniform dominance. No in-repo 56-dataset mean file supports a claim that Topic-FM wins all metrics versus Pure-VAE.</p>
+          <p><strong>12-dataset Wilcoxon, 11 named externals.</strong> A separate 12-dataset Wilcoxon export tests matched encoder pairs (Topic-FM vs. Pure-*-VAE) and does not override those 16-core means. Against 11 named externals (N_pairs = 12; 407 = 11 × 37 metric rows) the external table is a scoped signed-rank screen, not a 56 × 18 bake-off.</p>
+          <p><strong>Downstream kNN and programs.</strong> Downstream <em>k</em>NN classification on 12 datasets is higher for <span class="mono">Topic-FM-Transformer</span> than Pure-VAE (accuracy 0.733 vs. 0.646; macro-F1 0.517 vs. 0.405). Dual-pathway biological validation — perturbation importance and direct decoder-β readout — yields convergent GO enrichment, demonstrating that the learned topics correspond to coherent, annotatable gene programs rather than opaque embedding dimensions. Topic-GAT has no restored biology panel.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="figures">
+      <div class="wrap-wide">
+        <p class="kicker">Figures</p>
+        <h2 class="section-title">Programs 6–9 first; Fig. 2 is boxes, not a four-scatter</h2>
+        <p class="deck">Rasters copied from <span class="mono">benchmarks/paper_figures/topic/</span> (tenfig_labeled collages plus Fig. 1). Captions follow the locked panel order. Fig. 2 is (A) scatter / (B) ASW boxes / (C) DAV boxes / (D) NMI/ARI boxes — that live R figure is TikZ-only, so its card stays caption-only rather than showing the four-scatter PNG.</p>
+        <div class="toolbar" role="group" aria-label="Filter figures by role">
+          <button type="button" class="filter-chip" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" class="filter-chip" data-filter="biology" aria-pressed="false">6–9 · programs</button>
+          <button type="button" class="filter-chip" data-filter="architecture" aria-pressed="false">Architecture</button>
+          <button type="button" class="filter-chip" data-filter="metrics" aria-pressed="false">Geometry / clustering</button>
+          <button type="button" class="filter-chip" data-filter="gap" aria-pressed="false">GAT gap</button>
+        </div>
+        <div class="figure-grid">
+          <figure class="figure-card card-hover is-hero biology" data-findings="biology" id="fig-06">
+            <button type="button" class="thumb" data-full="figures/F06.png" aria-label="Open Fig. 6 · Biological validation">
+              <img src="figures/F06.png" alt="Setty perturbation-importance heatmaps for Topic-FM-Base and Topic-FM-Transformer plus decoder-beta readouts for Base and Contrastive" width="1200" height="900">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 6 · Biological validation (setty focus)</strong> <span class="chip-f chip-bio">biology</span></div>
+              <p>Perturbation modules and decoder β signatures. Restored subplot intent: (A) perturbation-importance heatmap (Topic-FM-Base); (B) perturbation-importance heatmap (Topic-FM-Transformer); (C) decoder-β readout (Topic-FM-Base); (D) decoder-β readout (Topic-FM-Contrastive). Flow matching does not rewrite β. No Topic-GAT bio panels exist in the restored asset set.</p>
+              <div class="fig-links">
+                <a href="figures/F06.png" download>PNG</a>
+                <a href="figures/F06.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card card-hover biology" data-findings="biology" id="fig-07">
+            <button type="button" class="thumb" data-full="figures/F07.png" aria-label="Open Fig. 7 · Latent–gene correlation">
+              <img src="figures/F07.png" alt="Latent-gene correlation blocks for setty, endoderm, and dentate" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 7 · Latent–gene correlation</strong> <span class="chip-f chip-bio">biology</span></div>
+              <p>Correlation blocks for setty, endoderm, and dentate. Block-diagonal Pearson <em>r</em> structure supports distinct topic programmes. This is a gene-program panel, not a clustering scoreboard.</p>
+              <div class="fig-links">
+                <a href="figures/F07.png" download>PNG</a>
+                <a href="figures/F07.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card card-hover biology" data-findings="biology" id="fig-08">
+            <button type="button" class="thumb" data-full="figures/F08.png" aria-label="Open Fig. 8 · Topic-colored UMAP">
+              <img src="figures/F08.png" alt="Topic-weighted UMAPs for setty, endoderm, and dentate with top-gene expression" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 8 · Topic-colored UMAP</strong> <span class="chip-f chip-bio">biology</span></div>
+              <p>Topic-weighted UMAPs for setty, endoderm, and dentate with top-gene expression. Topic colouring separates known cell-type structure. Qualitative grounding, not a 56-dataset mean table.</p>
+              <div class="fig-links">
+                <a href="figures/F08.png" download>PNG</a>
+                <a href="figures/F08.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card card-hover biology" data-findings="biology" id="fig-09">
+            <button type="button" class="thumb" data-full="figures/F09.png" aria-label="Open Fig. 9 · GO enrichment">
+              <img src="figures/F09.png" alt="GO enrichment grids for perturbation pathways and decoder-beta topics" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 9 · GO enrichment</strong> <span class="chip-f chip-bio">biology</span></div>
+              <p>GO grids for perturbation pathways and decoder-β topics. Identifiers wrap on this page when listed; they are not truncated. Topic-GAT is absent from this gallery.</p>
+              <div class="fig-links">
+                <a href="figures/F09.png" download>PNG</a>
+                <a href="figures/F09.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <div class="gap-card" data-findings="gap" id="fig-gat-gap">
+            <p class="kicker" style="color:#b7791f;">Honest gap</p>
+            <h3>Topic-GAT has no biological panel</h3>
+            <p>Architecture Fig. 1 still draws the GAT encoder. Biology stops at Base / Transformer / Contrastive. That absence is copy, not a blank image.</p>
+          </div>
+
+          <figure class="figure-card card-hover" data-findings="architecture" id="fig-01">
+            <button type="button" class="thumb" data-full="figures/F01.png" aria-label="Open Fig. 1 · Architecture">
+              <img src="figures/F01.png" alt="Four Topic-FM variants sharing a Dirichlet-prior VAE backbone with flow matching in pre-softmax space" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 1 · Architecture</strong> <span class="chip-f">architecture</span></div>
+              <p>Four Topic-FM variants share a Dirichlet-prior VAE backbone (n_topics = 10) with flow matching in pre-softmax ℝ<sup>K</sup>. (A) Topic-FM-Base MLP; (B) Topic-FM-Transformer; (C) Topic-FM-Contrastive; (D) Topic-FM-GAT. Viewer orange stays inside <span class="mono">model-arch-viewer/</span>.</p>
+              <div class="fig-links">
+                <a href="figures/F01.png" download>PNG</a>
+                <a href="figures/F01.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card figure-omit card-hover" data-findings="metrics" id="fig-02">
+            <p class="omit-note">PNG omitted — live Fig. 2 is TikZ (A scatter / B ASW boxes / C DAV boxes / D NMI/ARI boxes). The on-disk four-scatter PNG is not this figure.</p>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 2 · Cross-dataset metrics</strong> <span class="chip-f">metrics</span></div>
+              <p>Live panel order: (A) scatter; (B) ASW boxes; (C) DAV boxes; (D) NMI/ARI boxes. This is a statistical figure, not a gene-program or cell-type map, and not an NMI/ARI four-scatter. Mean ranking is locked to the 16-core ablation: Pure-VAE NMI 0.564 / ARI 0.363; Topic-FM-Transformer ASW 0.501 / DAV 0.763. Point clouds and boxes are a visual inventory, not a 56-dataset Topic-FM vs. Pure-VAE mean table.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card card-hover" data-findings="metrics" id="fig-03">
+            <button type="button" class="thumb" data-full="figures/F03.png" aria-label="Open Fig. 3 · Internal ablation">
+              <img src="figures/F03.png" alt="Topic-FM versus Pure-VAE ablation panels for clustering and projection fidelity on 16 core datasets" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 3 · Internal ablation</strong> <span class="chip-f">metrics</span></div>
+              <p>Topic-FM vs. Pure-VAE on 16 core datasets. Clustering (NMI, ARI, ASW, DAV) plus projection-fidelity panels. Concordance and geometry stay unpooled.</p>
+              <div class="fig-links">
+                <a href="figures/F03.png" download>PNG</a>
+                <a href="figures/F03.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card card-hover" data-findings="metrics" id="fig-04">
+            <button type="button" class="thumb" data-full="figures/F04.png" aria-label="Open Fig. 4 · Sensitivity">
+              <img src="figures/F04.png" alt="Hyperparameter sensitivity of Topic-FM-Base across NMI, ARI, ASW, and DAV" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 4 · Sensitivity</strong> <span class="chip-f">metrics</span></div>
+              <p>Hyperparameter sensitivity of Topic-FM-Base across NMI, ARI, ASW, and DAV. Geometry/clustering, not biology.</p>
+              <div class="fig-links">
+                <a href="figures/F04.png" download>PNG</a>
+                <a href="figures/F04.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card card-hover" data-findings="architecture" id="fig-05">
+            <button type="button" class="thumb" data-full="figures/F05.png" aria-label="Open Fig. 5 · Training geometry">
+              <img src="figures/F05.png" alt="Training and hyperparameter-sweep UMAPs for Topic-FM-Base" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 5 · Training geometry</strong> <span class="chip-f">architecture</span></div>
+              <p>Training and hyperparameter-sweep UMAPs for Topic-FM-Base. Geometry of training, not a gene-program gallery.</p>
+              <div class="fig-links">
+                <a href="figures/F05.png" download>PNG</a>
+                <a href="figures/F05.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+
+          <figure class="figure-card card-hover" data-findings="metrics" id="fig-10">
+            <button type="button" class="thumb" data-full="figures/F10.png" aria-label="Open Fig. 10 · External collage">
+              <img src="figures/F10.png" alt="External benchmark collage on 16 core datasets" width="1200" height="800">
+            </button>
+            <figcaption>
+              <div class="fig-kicker"><strong>Fig. 10 · External collage</strong> <span class="metric-tag">metric theatre</span></div>
+              <p>External benchmark collage on 16 core datasets. Wilcoxon scope is 11 named externals, N_pairs = 12, 407 = 11 × 37 metric rows — not 23 baselines and not 56 × 18.</p>
+              <div class="fig-links">
+                <a href="figures/F10.png" download>PNG</a>
+                <a href="figures/F10.pdf" download>PDF</a>
+              </div>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="code">
+      <div class="wrap">
+        <p class="kicker">Code</p>
+        <h2 class="section-title">Public method repository</h2>
+        <p class="deck">Clone the public remote. The architecture viewer is a local figure-export tool and is not this Site.</p>
+        <div class="install paper-card" style="display:block; margin-top:0;">
+          <h3>Install</h3>
+          <p>Public HTTPS remote:</p>
+          <pre><code>git clone https://github.com/PeterPonyu/PanODE-Topic.git</code></pre>
+          <h3>Families in this repo</h3>
+          <div class="table-wrap" style="margin-top:0.75rem;">
+            <table class="families">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Encoder</th>
+                  <th>Prior</th>
+                  <th>Flow matching</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="mono">Topic-FM-Base</span></td><td>MLP</td><td>Dirichlet / logistic-normal</td><td>Yes</td></tr>
+                <tr><td><span class="mono">Topic-FM-Transformer</span></td><td>Self-attention</td><td>Dirichlet / logistic-normal</td><td>Yes</td></tr>
+                <tr><td><span class="mono">Topic-FM-Contrastive</span></td><td>MLP + MoCo</td><td>Dirichlet / logistic-normal</td><td>Yes</td></tr>
+                <tr><td><span class="mono">Topic-FM-GAT</span></td><td>GAT over kNN</td><td>Dirichlet / logistic-normal</td><td>Yes</td></tr>
+                <tr><td><span class="mono">Pure-VAE</span></td><td>MLP</td><td>Gaussian</td><td>No</td></tr>
+                <tr><td><span class="mono">Pure-Transformer-VAE</span></td><td>Self-attention</td><td>Gaussian</td><td>No</td></tr>
+                <tr><td><span class="mono">Pure-Contrastive-VAE</span></td><td>MLP + MoCo</td><td>Gaussian</td><td>No</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>Internal tool</h3>
+          <p><span class="mono">model-arch-viewer/</span> is a Next.js layout exporter for manuscript figures. It is not the public IA and is not deployed as GitHub Pages. Viewer orange is not a page token.</p>
+          <div class="license-row" style="margin-top:1rem">
+            <a href="https://github.com/PeterPonyu/PanODE-Topic" rel="noopener noreferrer" target="_blank">github.com/PeterPonyu/PanODE-Topic</a>
+            <span>Wilcoxon: 11 externals · N_pairs = 12 · 407 = 11 × 37</span>
+          </div>
+        </div>
+        <div class="related">
+          <a class="related-card card-hover" href="https://peterponyu.github.io/" rel="noopener noreferrer" target="_blank">
+            <h3>Homepage</h3>
+            <p class="rule-note">ZF Lab public index. Papers, software, and related links.</p>
+          </a>
+          <a class="related-card card-hover" href="https://peterponyu.github.io/scportal/" rel="noopener noreferrer" target="_blank">
+            <h3>SCPortal</h3>
+            <p class="rule-note">Discovery hub for single-cell datasets, benchmarks, and companions.</p>
+          </a>
+          <a class="related-card card-hover" href="https://github.com/PeterPonyu/PanODE-DPMM" rel="noopener noreferrer" target="_blank">
+            <h3>PanODE-DPMM</h3>
+            <p class="rule-note">Sister method repo. DPMM Pages are not published; this card is Code, not a 404 Site.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cite">
+      <div class="wrap">
+        <p class="kicker">Cite</p>
+        <h2 class="section-title">Software stub until an article DOI exists</h2>
+        <p class="deck">No article DOI is registered. Do not invent <span class="mono">doi =</span>. Do not treat the Site URL as live until it returns HTTP 200.</p>
+        <div class="cite-block">
+          <div class="cite-toolbar">
+            <h3>Preprint stub</h3>
+            <button type="button" class="copy-btn" id="copy-bibtex">Copy BibTeX</button>
+          </div>
+          <pre class="bibtex" id="bibtex">@misc{Fu2026PanODETopic,
+  author = {Fu, Zeyu},
+  title  = {Simplex-Constrained Neural Topic VAEs with Flow Refinement for Interpretable Single-Cell Gene-Program Discovery},
+  year   = {2026},
+  note   = {Manuscript. Software: https://github.com/PeterPonyu/PanODE-Topic. No article DOI yet.}
+}</pre>
+          <p class="peerj-line" id="copy-status" aria-live="polite"></p>
+          <p class="peerj-line">Cite the public repository today. Swap in an article DOI only after it exists. Site badge stays off while github.io returns 404.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap-wide footer-grid">
+      <div>
+        <h2>PanODE-Topic</h2>
+        <p>A ZF Lab paper leaf. Simplex topic proportions and decoder β gene programs. Not SCPortal, not a training UI, and not the architecture viewer. Slug <span class="mono">topic</span>.</p>
+      </div>
+      <div>
+        <h3>Browse</h3>
+        <ul>
+          <li><a href="#abstract">Abstract</a></li>
+          <li><a href="#figures">Figures</a></li>
+          <li><a href="#code">Code</a></li>
+          <li><a href="#cite">Cite</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Graph</h3>
+        <ul>
+          <li><a href="https://peterponyu.github.io/" rel="noopener noreferrer" target="_blank">Homepage</a></li>
+          <li><a href="https://peterponyu.github.io/scportal/" rel="noopener noreferrer" target="_blank">SCPortal</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Code · Cite</h3>
+        <ul>
+          <li><a href="https://github.com/PeterPonyu/PanODE-Topic" rel="noopener noreferrer" target="_blank">GitHub (public)</a></li>
+          <li><a href="#cite">BibTeX</a></li>
+          <li><span>Site — Pages not published</span></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <dialog class="lightbox" id="lightbox" aria-labelledby="lightbox-title">
+    <div class="lightbox-bar">
+      <strong id="lightbox-title">Figure</strong>
+      <button type="button" class="lightbox-close" id="lightbox-close">Close</button>
+    </div>
+    <figure>
+      <img id="lightbox-img" alt="">
+      <figcaption id="lightbox-caption"></figcaption>
+    </figure>
+  </dialog>
+
+  <script src="js/site.js"></script>
+</body>
+</html>
