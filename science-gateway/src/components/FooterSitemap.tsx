@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { badgeEntries } from '@/lib/badges';
 import { ROUTES, SITE } from '@/lib/site';
 
@@ -8,9 +9,9 @@ export default function FooterSitemap() {
         <span className="font-medium text-slate-700">{SITE.title}</span>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           {ROUTES.map((route) => (
-            <a key={route.href} href={route.href} className="transition-colors hover:text-teal-600">
+            <Link key={route.href} href={route.href} className="transition-colors hover:text-teal-600">
               {route.label}
-            </a>
+            </Link>
           ))}
           <a href={SITE.homepage} className="transition-colors hover:text-teal-600">
             Homepage
