@@ -151,3 +151,29 @@ __pycache__/
 *.fls
 *.synctex.gz
 
+# ── AI tooling / process artifacts (never public) ────────────────────────────
+.cursor/
+.cursor.cloud
+.cursorignore
+.codex/
+.claude/
+agent-transcripts/
+*.canvas.tsx
+
+# ── Secrets / credentials ────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+credentials
+credentials.*
+*.pem
+*.key
+
+# ── Editor / AI assistant caches ─────────────────────────────────────────────
+.aider*
+.codeium/
+.continue/
+.cody/
+.tabnine/
+*.ai-cache
+

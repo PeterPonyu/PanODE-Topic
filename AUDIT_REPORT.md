@@ -185,13 +185,13 @@ Recommended follow-up:
 
 Status: good structure, moderate evidence risk.
 
-- This area is clearly organized as manuscript source, with tracked tables under `article/topic/tables/` and build support in `article/build.sh`.
+- This area is clearly organized as article source, with tracked tables under `article/topic/tables/` and build support in `article/build.sh`.
 - It is a strong narrative anchor for the paper side of the project.
 - The main risk is that article assets look publication-ready while the upstream raw outputs that feed them are mostly not versioned.
 
 Recommended follow-up:
 - Add a note in the article build path that lists which generated inputs must exist before building.
-- Link manuscript tables back to the source result files used to create them.
+- Link article tables back to the source result files used to create them.
 
 ### `models/`
 
@@ -530,7 +530,7 @@ What limits the claim:
 
 Audit conclusion:
 - Results are clear enough for internal iteration and refinement.
-- Results are not yet fully clear enough for long-term external auditing without additional packaging and statistical cleanup.
+- Results are not yet fully clear enough for long-term external auditing without additional consolidation and statistical cleanup.
 
 ## Recommended Refinement Order
 

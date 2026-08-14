@@ -20,7 +20,6 @@ PanODE-Topic/
 ├── models/                   # Topic-FM, Topic, and Pure-VAE implementations
 ├── benchmarks/               # Training, evaluation, and validation workflows
 ├── eval_lib/                 # Baseline wrappers and evaluation utilities
-├── article/                  # Manuscript-facing materials
 ├── experiments/              # External comparison and analysis workflows
 ├── refined_figures/          # Figure refinement utilities
 ├── scripts/                  # Maintenance and workflow helpers
