@@ -28,7 +28,7 @@ export default function ClaimsPage() {
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
           <li>Single-metric “best method” narrative across NMI and ASW simultaneously</li>
           <li>Fig. 2 four-scatter PNG on this Site (caption-only)</li>
-          <li>Journal venue packaging or invented article DOI</li>
+          <li>Publication-forward packaging or invented article DOI</li>
         </ul>
       </section>
 

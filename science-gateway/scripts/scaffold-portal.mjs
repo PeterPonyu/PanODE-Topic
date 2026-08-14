@@ -314,7 +314,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: actions/setup-node@49933ea5288caeca8642d29e6ab316508ebc106b
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm

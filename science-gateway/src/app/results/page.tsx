@@ -14,7 +14,7 @@ export default function ResultsPage() {
       <section className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-6">
         <h2 className="text-lg font-semibold text-slate-900">Fig. 2 · caption only</h2>
         <p className="mt-2 text-slate-700">
-          Four-scatter trade-off panel (NMI vs ASW across variants). Live manuscript uses TikZ
+          Four-scatter trade-off panel (NMI vs ASW across variants). The live layout uses TikZ
           boxes; the four-scatter PNG from benchmarks is intentionally not shipped here to avoid
           contradicting the caption-first layout lock.
         </p>
@@ -27,7 +27,7 @@ export default function ResultsPage() {
             src={`/figures/${file}.png`}
             alt={`${file} results panel`}
             kicker={`${file}`}
-            caption={`Results panel ${file}. See manuscript FIGURE-PROVENANCE for source paths.`}
+            caption={`Results panel ${file}. Source paths are listed in repo FIGURE-PROVENANCE.`}
           />
         ))}
       </div>
