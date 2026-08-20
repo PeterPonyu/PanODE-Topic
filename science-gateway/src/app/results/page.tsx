@@ -1,36 +1,32 @@
 import PageShell from '@/components/PageShell';
-import FigurePanel from '@/components/FigurePanel';
-
-const SHIPPED_FIGURES = ['F01', 'F03', 'F04', 'F05', 'F06', 'F07', 'F08', 'F09', 'F10'] as const;
+import { SITE } from '@/lib/site';
 
 export default function ResultsPage() {
   return (
-    <PageShell title="Results" kicker="Outcome figures">
+    <PageShell title="Repository layout" kicker="Public directories">
       <p>
-        Primary interpretability results are β gene programs (Fig. 6). Fig. 2 documents the
-        four-scatter trade-off layout in caption only — the PNG is not wired on this Site.
+        This site does not host manuscript figures or evaluation tables. The public repository
+        layout is:
       </p>
-
-      <section className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Fig. 2 · caption only</h2>
-        <p className="mt-2 text-slate-700">
-          Four-scatter trade-off panel (NMI vs ASW across variants). The live layout uses TikZ
-          boxes; the four-scatter PNG from benchmarks is intentionally not shipped here to avoid
-          contradicting the caption-first layout lock.
-        </p>
-      </section>
-
-      <div className="grid gap-6">
-        {SHIPPED_FIGURES.map((file) => (
-          <FigurePanel
-            key={file}
-            src={`/figures/${file}.png`}
-            alt={`${file} results panel`}
-            kicker={`${file}`}
-            caption={`Results panel ${file}. Source paths are listed in repo FIGURE-PROVENANCE.`}
-          />
-        ))}
-      </div>
+      <pre className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-4 font-mono text-[13px] leading-6 text-slate-800">
+        <code>{`PanODE-Topic/
+├── models/        Topic-FM, Topic, and Pure-VAE implementations
+├── benchmarks/    Training, evaluation, and validation runners
+├── eval_lib/      Baseline wrappers and evaluation utilities
+├── experiments/   Comparison and analysis workflows
+├── refined_figures/
+├── scripts/       Maintenance helpers
+├── utils/         Shared training and data helpers
+├── src/           Visualization helpers
+└── vcd/           Visual consistency diagnostics`}</code>
+      </pre>
+      <p>
+        Source:{' '}
+        <a href={SITE.github} className="text-indigo-800 underline-offset-2 hover:underline">
+          github.com/PeterPonyu/PanODE-Topic
+        </a>
+        .
+      </p>
     </PageShell>
   );
 }

@@ -10,7 +10,7 @@ export default function RouteCards() {
           href={route.href}
           className="card-hover flex gap-4 rounded-2xl border border-slate-200 bg-white/80 p-5"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-800 font-mono text-sm font-bold text-indigo-50">
             {route.number}
           </span>
           <div>

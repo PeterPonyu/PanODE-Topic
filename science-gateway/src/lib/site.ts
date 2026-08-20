@@ -1,22 +1,20 @@
 /**
- * PanODE-Topic science gateway site config.
+ * PanODE-Topic public code page. Do not put unpublished metric locks or figures here.
  */
 export const SITE = {
   slug: 'PanODE-Topic',
   navTitle: 'PanODE-Topic',
-  title:
-    'Simplex-constrained topic VAEs with flow refinement recover interpretable gene programs without winning NMI',
-  kicker: 'ZF Lab · simplex topics · β gene programs',
+  title: 'PanODE-Topic',
+  kicker: 'Topic-FM · Dirichlet topic VAE · public code',
   lead:
-    'Topic proportions on the simplex and decoder β gene programs. Flow matching tightens geometry; it does not rewrite β and does not flip concordance locks.',
+    'This repository implements Topic-FM and Pure-VAE model families for single-cell representation learning. The page describes the public code. It is not a journal article.',
   physicalObject:
-    'Decoder β gene programs and setty perturbation-importance heatmaps (Fig. 6). Fig. 2 is caption-only (four-scatter not wired).',
+    'A neural topic VAE with simplex topic proportions, a decoder β matrix, and optional flow-matching refinement.',
   primaryClaim:
-    'Pure-VAE leads NMI/ARI concordance; Topic-FM-Transformer leads ASW/DAV geometry — a split outcome, not a single clustering win.',
+    'The public tree contains model code, benchmark runners, and evaluation utilities. No article DOI is assigned.',
   homepage: 'https://peterponyu.github.io/',
   scportal: 'https://peterponyu.github.io/scportal/',
   github: 'https://github.com/PeterPonyu/PanODE-Topic',
-  sisterSite: 'https://peterponyu.github.io/PanODE-DPMM/',
 } as const;
 
 export type BadgeConfig = {
@@ -40,24 +38,18 @@ export const BADGES = {
   archive: {
     label: 'Archive',
     enabled: false,
-    disabledReason: 'No Zenodo record yet',
+    disabledReason: 'No Zenodo record',
   } satisfies BadgeConfig,
   articleDoi: {
     label: 'Article DOI',
     enabled: false,
-    disabledReason: 'On acceptance',
+    disabledReason: 'Not a journal article',
   } satisfies BadgeConfig,
 } as const;
 
 export const ROUTES = [
-  { href: '/results', label: 'Results', number: '01', blurb: 'β programs (Fig. 6); Fig. 2 caption-only.' },
-  { href: '/methods', label: 'Methods', number: '02', blurb: 'Simplex topic VAE, flow refinement, benchmarks.' },
-  { href: '/evidence', label: 'Evidence', number: '03', blurb: 'Concordance vs geometry metric locks.' },
-  { href: '/claims', label: 'Claims', number: '04', blurb: 'Split-outcome claims and scope limits.' },
+  { href: '/results', label: 'Layout', number: '01', blurb: 'Public directories in this repository.' },
+  { href: '/methods', label: 'Run', number: '02', blurb: 'Topic-FM runners and default settings.' },
+  { href: '/evidence', label: 'Models', number: '03', blurb: 'Topic-FM and Pure-VAE families.' },
+  { href: '/claims', label: 'Scope', number: '04', blurb: 'Code page, not a paper.' },
 ] as const;
-
-/** Science locks — verifier-gated numbers */
-export const METRIC_LOCKS = {
-  pureVae: { nmi: '0.564', ari: '0.363', label: 'Pure-VAE · label concordance' },
-  topicFm: { asw: '0.501', dav: '0.763', label: 'Topic-FM-Transformer · geometry' },
-} as const;

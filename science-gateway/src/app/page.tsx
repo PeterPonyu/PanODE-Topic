@@ -1,91 +1,99 @@
-import { ClaimBlock } from '@/components/PageShell';
 import RouteCards from '@/components/RouteCards';
-import FigurePanel from '@/components/FigurePanel';
-import StatTile from '@/components/StatTile';
-import { METRIC_LOCKS, SITE } from '@/lib/site';
+import { SITE } from '@/lib/site';
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-800">
         {SITE.kicker}
       </p>
-      <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+      <h1 className="mt-3 font-mono text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
         {SITE.title}
       </h1>
-      <p className="mt-4 max-w-3xl text-lg text-slate-700">{SITE.lead}</p>
+      <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700">{SITE.lead}</p>
 
-      <section className="mt-10 rounded-2xl border border-slate-200 bg-white/80 p-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Physical object
-        </h2>
-        <p className="mt-2 text-slate-800">{SITE.physicalObject}</p>
-      </section>
-
-      <div className="mt-8">
-        <ClaimBlock />
-      </div>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
-            {METRIC_LOCKS.pureVae.label}
-          </p>
-          <div className="mt-3 flex gap-6 font-mono">
-            <div>
-              <p className="text-2xl font-bold text-brand">{METRIC_LOCKS.pureVae.nmi}</p>
-              <p className="text-xs text-slate-600">NMI</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-brand">{METRIC_LOCKS.pureVae.ari}</p>
-              <p className="text-xs text-slate-600">ARI</p>
-            </div>
-          </div>
-          <p className="mt-3 text-sm text-slate-600">
-            Gaussian-prior Pure-VAE baseline. Concordance lock — Topic-FM does not win NMI or ARI.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-teal-200 bg-teal-50/50 p-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">
-            {METRIC_LOCKS.topicFm.label}
-          </p>
-          <div className="mt-3 flex gap-6 font-mono">
-            <div>
-              <p className="text-2xl font-bold text-teal-700">{METRIC_LOCKS.topicFm.asw}</p>
-              <p className="text-xs text-slate-600">ASW</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-teal-700">{METRIC_LOCKS.topicFm.dav}</p>
-              <p className="text-xs text-slate-600">DAV</p>
-            </div>
-          </div>
-          <p className="mt-3 text-sm text-slate-600">
-            Geometry lock only. Not an NMI win — flow matching sharpens contours without flipping
-            concordance.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile value="11" label="Wilcoxon externals" />
-        <StatTile value="12" label="N_pairs matched" />
-        <StatTile value="10" label="Topics / simplex dim" />
-        <StatTile value="407" label="Wilcoxon rows" note="11 × 37" />
-      </div>
-
-      <section className="mt-10">
-        <FigurePanel
-          src="/figures/F06.png"
-          alt="Setty perturbation-importance heatmaps and decoder-beta readouts"
-          kicker="Fig. 6 · β gene programs"
-          caption="Biological validation panel: perturbation-importance heatmaps and decoder β readouts. Primary interpretability object for this direction."
-        />
+      <section className="mt-10 rounded-xl border border-indigo-100 bg-indigo-50/40 p-5">
+        <h2 className="font-mono text-sm font-semibold text-indigo-900">What this code implements</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{SITE.physicalObject}</p>
+        <p className="mt-3 text-sm leading-6 text-slate-700">{SITE.primaryClaim}</p>
       </section>
 
       <section className="mt-10">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Explore
-        </h2>
+        <h2 className="font-mono text-sm font-semibold text-slate-900">Model families</h2>
+        <div className="mt-3 overflow-x-auto">
+          <table className="min-w-full border-collapse text-left text-sm text-slate-700">
+            <thead>
+              <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                <th className="py-2 pr-4 font-medium">Model</th>
+                <th className="py-2 pr-4 font-medium">Encoder</th>
+                <th className="py-2 pr-4 font-medium">Prior</th>
+                <th className="py-2 font-medium">Flow matching</th>
+              </tr>
+            </thead>
+            <tbody className="font-mono text-[13px]">
+              <tr className="border-b border-slate-100">
+                <td className="py-2 pr-4">Topic-FM-Base</td>
+                <td className="py-2 pr-4">MLP</td>
+                <td className="py-2 pr-4">Dirichlet / logistic-normal</td>
+                <td className="py-2">Yes</td>
+              </tr>
+              <tr className="border-b border-slate-100">
+                <td className="py-2 pr-4">Topic-FM-Transformer</td>
+                <td className="py-2 pr-4">Self-attention</td>
+                <td className="py-2 pr-4">Dirichlet / logistic-normal</td>
+                <td className="py-2">Yes</td>
+              </tr>
+              <tr className="border-b border-slate-100">
+                <td className="py-2 pr-4">Topic-FM-Contrastive</td>
+                <td className="py-2 pr-4">MLP + MoCo</td>
+                <td className="py-2 pr-4">Dirichlet / logistic-normal</td>
+                <td className="py-2">Yes</td>
+              </tr>
+              <tr className="border-b border-slate-100">
+                <td className="py-2 pr-4">Topic-FM-GAT</td>
+                <td className="py-2 pr-4">GAT over kNN</td>
+                <td className="py-2 pr-4">Dirichlet / logistic-normal</td>
+                <td className="py-2">Yes (optional)</td>
+              </tr>
+              <tr className="border-b border-slate-100">
+                <td className="py-2 pr-4">Pure-VAE</td>
+                <td className="py-2 pr-4">MLP</td>
+                <td className="py-2 pr-4">Gaussian</td>
+                <td className="py-2">No</td>
+              </tr>
+              <tr className="border-b border-slate-100">
+                <td className="py-2 pr-4">Pure-Transformer-VAE</td>
+                <td className="py-2 pr-4">Self-attention</td>
+                <td className="py-2 pr-4">Gaussian</td>
+                <td className="py-2">No</td>
+              </tr>
+              <tr>
+                <td className="py-2 pr-4">Pure-Contrastive-VAE</td>
+                <td className="py-2 pr-4">MLP + MoCo</td>
+                <td className="py-2 pr-4">Gaussian</td>
+                <td className="py-2">No</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="font-mono text-sm font-semibold text-slate-900">Run</h2>
+        <pre className="mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-4 text-[13px] leading-6 text-slate-800">
+          <code>{`python benchmarks/runners/benchmark_base.py --series topic --data-path <dataset-path>
+python benchmarks/runners/benchmark_base.py --models Topic-FM-Transformer Pure-VAE --data-path <dataset-path>
+python benchmarks/runners/benchmark_crossdata.py --datasets <dataset-key> <dataset-key>`}</code>
+        </pre>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          Pass a local dataset with <code className="font-mono text-[13px]">--data-path</code> for
+          single-dataset runs. Cross-dataset runs need registry keys aligned on the machine that
+          executes them.
+        </p>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="mb-3 font-mono text-sm font-semibold text-slate-900">Pages</h2>
         <RouteCards />
       </section>
     </div>

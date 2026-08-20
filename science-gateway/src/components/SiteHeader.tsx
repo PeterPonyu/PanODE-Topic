@@ -10,13 +10,13 @@ function navClass(active: boolean): string {
   return [
     'shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
     active
-      ? 'bg-teal-50 text-teal-700 ring-1 ring-teal-100'
-      : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700',
+      ? 'bg-indigo-50 text-indigo-800 ring-1 ring-indigo-100'
+      : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-800',
   ].join(' ');
 }
 
 function chipClass(): string {
-  return 'shrink-0 whitespace-nowrap rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors hover:border-teal-300 hover:text-teal-700';
+  return 'shrink-0 whitespace-nowrap rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors hover:border-indigo-300 hover:text-indigo-800';
 }
 
 function disabledBadgeClass(): string {
@@ -47,10 +47,10 @@ export default function SiteHeader() {
           className="flex shrink-0 items-center gap-2 text-base font-bold tracking-tight text-brand"
           onClick={() => setMenuOpen(false)}
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-xs font-bold text-white">
-            sg
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-800 font-mono text-sm font-bold text-indigo-50">
+            θ
           </span>
-          <span className="max-w-[12rem] truncate text-slate-800 sm:max-w-xs">{SITE.navTitle}</span>
+          <span className="max-w-[12rem] truncate font-mono text-slate-800 sm:max-w-xs">{SITE.navTitle}</span>
         </Link>
 
         <nav
@@ -97,7 +97,7 @@ export default function SiteHeader() {
 
         <button
           type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-teal-300 hover:text-teal-700 lg:hidden"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-indigo-300 hover:text-indigo-800 lg:hidden"
           aria-expanded={menuOpen}
           aria-controls="sg-mobile-nav"
           onClick={() => setMenuOpen((open) => !open)}
@@ -124,7 +124,7 @@ export default function SiteHeader() {
           ))}
           <div className="mt-2 grid gap-2 border-t border-slate-100 pt-3 text-sm font-semibold">
             {seriesLeaves.map((item) => (
-              <a key={item.href} href={item.href} className="text-slate-600 hover:text-teal-700">
+              <a key={item.href} href={item.href} className="text-slate-600 hover:text-indigo-800">
                 {item.label}
               </a>
             ))}
@@ -133,7 +133,7 @@ export default function SiteHeader() {
                 <a
                   key={key}
                   href={badge.href}
-                  className="text-slate-600 hover:text-teal-700"
+                  className="text-slate-600 hover:text-indigo-800"
                   {...(isExternalHref(badge.href)
                     ? { target: '_blank', rel: 'noopener noreferrer' }
                     : {})}

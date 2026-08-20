@@ -10,13 +10,13 @@ export default function PageShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       {kicker ? (
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-800">
           {kicker}
         </p>
       ) : null}
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">{title}</h1>
+      <h1 className="mt-3 font-mono text-3xl font-bold tracking-tight text-slate-900">{title}</h1>
       <div className="mt-8 space-y-6 text-slate-700">{children}</div>
     </div>
   );
@@ -24,12 +24,9 @@ export default function PageShell({
 
 export function ClaimBlock() {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white/80 p-6">
-      <h2 className="text-lg font-semibold text-slate-900">Primary claim</h2>
-      <p className="mt-3 text-slate-700">{SITE.primaryClaim}</p>
-      <p className="mt-4 text-sm text-slate-500">
-        Scope: unpublished results site. Refutation hooks belong on the Claims route.
-      </p>
+    <section className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-5">
+      <h2 className="font-mono text-sm font-semibold text-indigo-900">Public code page</h2>
+      <p className="mt-3 text-sm leading-6 text-slate-700">{SITE.primaryClaim}</p>
     </section>
   );
 }

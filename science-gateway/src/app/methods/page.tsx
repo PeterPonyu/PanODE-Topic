@@ -3,45 +3,38 @@ import { SITE } from '@/lib/site';
 
 export default function MethodsPage() {
   return (
-    <PageShell title="Methods" kicker="Protocol and definitions">
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900">Model</h2>
+    <PageShell title="How to run" kicker="Runners and defaults">
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-slate-900">Runners</h2>
         <p>
-          Simplex-constrained neural topic VAE with optional flow-matching refinement. Topic
-          proportions live on the simplex; decoder β matrices define interpretable gene programs.
+          Base and single-dataset jobs go through{' '}
+          <code className="font-mono text-[13px]">benchmarks/runners/benchmark_base.py</code> with{' '}
+          <code className="font-mono text-[13px]">--series topic</code>. Cross-dataset jobs use{' '}
+          <code className="font-mono text-[13px]">benchmark_crossdata.py</code> and configured
+          registry keys.
         </p>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900">Benchmark protocol</h2>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>11 named Wilcoxon externals, 37 metrics each, 12 matched N_pairs</li>
-          <li>Pure-VAE Gaussian baseline for concordance comparison</li>
-          <li>Topic-FM variants (Base, Transformer, Contrastive) for geometry comparison</li>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-slate-900">Default training settings</h2>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>Learning rate <code className="font-mono text-[13px]">1e-3</code></li>
+          <li>Batch size <code className="font-mono text-[13px]">128</code></li>
+          <li>Topics / latent dim <code className="font-mono text-[13px]">10</code></li>
+          <li>Epochs <code className="font-mono text-[13px]">1000</code></li>
+          <li>KL weight <code className="font-mono text-[13px]">0.01</code> for Topic-FM</li>
+          <li>Flow warmup <code className="font-mono text-[13px]">50</code> epochs</li>
+          <li>Flow weight <code className="font-mono text-[13px]">0.1</code></li>
+          <li>HVGs <code className="font-mono text-[13px]">3000</code>, max cells <code className="font-mono text-[13px]">3000</code></li>
         </ul>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900">Exclusions</h2>
-        <ul className="list-disc space-y-2 pl-5">
-          <li>Fig. 2 four-scatter PNG not deployed (caption-only lock)</li>
-          <li>No claim that Topic-FM wins NMI or ARI</li>
-          <li>No GPU benchmark campaigns from this Site leaf</li>
-        </ul>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900">Reproducibility</h2>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-slate-900">Code</h2>
         <p>
-          Public code:{' '}
-          <a href={SITE.github} className="text-brand hover:underline" target="_blank" rel="noopener noreferrer">
+          <a href={SITE.github} className="text-indigo-800 underline-offset-2 hover:underline">
             github.com/PeterPonyu/PanODE-Topic
           </a>
-          . Sister DPMM method:{' '}
-          <a href={SITE.sisterSite} className="text-brand hover:underline">
-            PanODE-DPMM Site
-          </a>
-          .
         </p>
       </section>
     </PageShell>

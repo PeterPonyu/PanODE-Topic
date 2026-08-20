@@ -39,10 +39,33 @@ jobs:
             exit 1
           fi
           python3 - <<'PY'
+          import re
           from pathlib import Path
           root = Path("docs")
           html = list(root.rglob("*.html"))
           assert html, "no html"
+          rasters = [p for p in root.rglob("*") if p.suffix.lower() in {".png", ".pdf", ".jpg", ".jpeg", ".webp"}]
+          assert not rasters, f"unpublished rasters in docs: {rasters}"
+          leak = [
+              re.compile(r"unpublished results", re.I),
+              re.compile(r"\bNMI\b"),
+              re.compile(r"\bARI\b"),
+              re.compile(r"\bASW\b"),
+              re.compile(r"\bDAV\b"),
+              re.compile(r"0\.564"),
+              re.compile(r"0\.363"),
+              re.compile(r"0\.501"),
+              re.compile(r"0\.763"),
+          ]
+          hits = []
+          for p in root.rglob("*"):
+              if p.suffix.lower() not in {".html", ".txt"}:
+                  continue
+              text = p.read_text(encoding="utf-8", errors="ignore")
+              for pat in leak:
+                  if pat.search(text):
+                      hits.append(f"{p}:{pat.pattern}")
+          assert not hits, f"unpublished lock leak in docs: {hits}"
           print(f"ok {len(html)} html files")
           PY
       - name: Upload Pages artifact

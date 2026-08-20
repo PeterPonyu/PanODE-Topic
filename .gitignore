@@ -32,9 +32,9 @@ model-arch-viewer/package-lock.json
 # Only source code should be tracked; all generated outputs are excluded.
 *.png
 *.pdf
-# Paper-leaf rasters for GitHub Pages (no F02 four-scatter).
-!docs/figures/*.png
-!docs/figures/*.pdf
+# Public Pages is a code-description leaf. Do not re-add unpublished rasters.
+science-gateway/public/figures/*.png
+science-gateway/public/figures/*.pdf
 *.eps
 *.tiff
 *.npz
